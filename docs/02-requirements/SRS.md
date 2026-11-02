@@ -177,7 +177,8 @@ flowchart LR
 ## 3.5 المحاسبة (Accounting) — ACC
 | ID | المتطلب | الأولوية | المصدر | الإصدار |
 |---|---|---|---|---|
-| FR-ACC-001 | THE SYSTEM SHALL maintain a Chart of Accounts (asset, liability, equity, revenue, expense) with a default pharmacy template in Arabic. | Must | CH-F03, R6 | MVP |
+| FR-ACC-000 | THE SYSTEM SHALL present accounting to end users in "Commercial Mode" (sales, purchases, expenses, cash, debts, stocktake, profit) with no debit/credit terminology; full accounting screens SHALL be gated by feature `accounting_full`. (D-022) | Must | D-022 | MVP |
+| FR-ACC-001 | THE SYSTEM SHALL maintain a Chart of Accounts (asset, liability, equity, revenue, expense) with a default pharmacy template in Arabic (internal; UI gated by `accounting_full`). | Must (engine) / Should (UI) | CH-F03, R6 | MVP |
 | FR-ACC-002 | THE SYSTEM SHALL record every financial event as a balanced, immutable Journal Entry (Σdebit = Σcredit) linked to its source document. | Must | CH-F04, D-019 | MVP |
 | FR-ACC-003 | THE SYSTEM SHALL value inventory and COGS using the actual lot cost (specific identification). | Must | R6 | MVP |
 | FR-ACC-004 | THE SYSTEM SHALL manage Cash/Bank accounts and record Expenses by category with optional attachment. | Must | CH-F03 | MVP |
