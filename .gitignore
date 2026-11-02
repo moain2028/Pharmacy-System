@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.DS_Store
+.tmp_chats/
+media/video/*.mp3
+media/video/frames/
