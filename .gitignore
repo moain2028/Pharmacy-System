@@ -7,3 +7,5 @@ dist/
 .tmp_chats/
 media/video/*.mp3
 media/video/frames/
+media/video/audio/
+__pycache__/
