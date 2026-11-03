@@ -16,6 +16,8 @@ const schema = z.object({
   /** Expose Swagger UI in production too (desktop build sets true; LAN-only). */
   ENABLE_DOCS: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
   BACKUP_KEEP: z.coerce.number().int().min(1).default(30),
+  /** Trial/demo installs only: seeds a demo pharmacy with users "1"/"1" (owner) and "2"/"2" (cashier) and shows quick-login buttons. Never enable for a real pharmacy. */
+  DEMO_MODE: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
   AUTO_MIGRATE: z
     .enum(["true", "false"])
     .default("true")

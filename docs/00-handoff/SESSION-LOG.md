@@ -129,3 +129,9 @@
 - **API bug fixed:** postgres.js `tx.array()` inside `ANY()` fails on single-element arrays (`uuid = text` / malformed literal) → 500 on allocated customer receipts. All sites now bind plain arrays with explicit `::uuid[]`/`::text[]` casts (returns, purchasing, payables, treasury, import). Regression test added (treasury e2e → 7). API suite **94/94**.
 - Smoke `tools/smoke/pharmacy-day.mjs` now **passes end-to-end** (setup → PO/GRN → sale/change/COGS → return → expense → credit sale → receipt → supplier invoice/payment → X/Z → trial balance/P&L/balance sheet/valuation → backup+checksum). Added as a CI step against the built API.
 - Ops note: `fuser -k 3100/tcp` does not see the server in this sandbox — use `ss -ltnp | grep 3100` and `kill -9 <pid>`.
+
+## Session #10 — 2026-11-03 (continuation)
+- **CI red on main fixed**: backup `create()` collided on same-second filenames (`prunes to BACKUP_KEEP` flaky) → now advances to the next free second; filename contract unchanged.
+- **DEMO_MODE** (owner request, trial only): `DEMO_MODE=true` → `DemoSeedService` (OnApplicationBootstrap) initializes a demo pharmacy if none exists and ensures users **1/1 (OWNER)** and **2/2 (CASHIER)**, resetting their password/lock every boot. `/setup/status` returns `demo: true`; `LoginPage` shows quick-login buttons only then. Default false → production rules (8-char password, wizard) untouched. E2E `demo-mode.e2e.test.ts` (3). API **98/98**, web **44/44**.
+- Live box `/tmp/run_api.sh` now has `DEMO_MODE=true`; verified 1/1 and 2/2 log in via API and the panel renders in browser with zero console errors.
+- `install-services.ps1` documents the flag (commented out).

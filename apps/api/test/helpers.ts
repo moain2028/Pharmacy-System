@@ -13,11 +13,11 @@ export interface TestCtx {
 }
 
 /** Fresh DB + initialized pharmacy + logged-in owner. */
-export async function bootTestApp(opts: { baseCurrency?: string } = {}): Promise<TestCtx> {
+export async function bootTestApp(opts: { baseCurrency?: string; env?: Record<string, string>; skipSetup?: boolean } = {}): Promise<TestCtx> {
   const sql = connect(DATABASE_URL, 1);
   await resetDatabase(sql, { allowDestructive: true });
   await sql.end();
-  const cfg = loadConfig({ ...process.env, NODE_ENV: "test", DATABASE_URL, JWT_SECRET: "test-secret-test-secret-test-secret-1234" });
+  const cfg = loadConfig({ ...process.env, NODE_ENV: "test", DATABASE_URL, JWT_SECRET: "test-secret-test-secret-test-secret-1234", ...(opts.env ?? {}) });
   const app = await createApp(cfg);
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
@@ -33,6 +33,7 @@ export async function bootTestApp(opts: { baseCurrency?: string } = {}): Promise
       return { status: res.statusCode, body: json };
     },
   };
+  if (opts.skipSetup) return ctx;
   const init = await ctx.call("POST", "/setup/initialize", {
     pharmacy: { nameAr: "صيدلية الاختبار", nameEn: "Test Pharmacy", baseCurrency: opts.baseCurrency ?? "YER_NEW" },
     owner: { username: "owner", displayName: "Owner", password: "Str0ngPass!", pin: "1234" },

@@ -9,7 +9,7 @@ export const en: Record<string, string> = {
   "nav.dashboard": "Dashboard", "nav.pos": "Point of Sale", "nav.sales": "Sales", "nav.returns": "Returns", "nav.customers": "Customers", "nav.items": "Items", "nav.inventory": "Inventory",
   "nav.expiry": "Expiry", "nav.purchasing": "Purchasing", "nav.suppliers": "Suppliers", "nav.payables": "Payables", "nav.cash": "Cash & Shifts", "nav.expenses": "Expenses",
   "nav.reports": "Reports", "nav.accounting": "Accounting", "nav.settings": "Settings", "nav.users": "Users", "nav.logout": "Sign out", "nav.language": "العربية",
-  "auth.title": "Sign in", "auth.username": "Username", "auth.password": "Password", "auth.signIn": "Sign in", "auth.pin": "PIN", "auth.approver": "Approver", "auth.approverSecret": "PIN or password",
+  "auth.demoTitle": "Quick login (demo build)", "auth.demoOwner": "Owner", "auth.demoCashier": "Cashier", "auth.title": "Sign in", "auth.username": "Username", "auth.password": "Password", "auth.signIn": "Sign in", "auth.pin": "PIN", "auth.approver": "Approver", "auth.approverSecret": "PIN or password",
   "setup.title": "Set up your pharmacy", "setup.pharmacy": "Pharmacy", "setup.owner": "Owner account", "setup.currency": "Base currency", "setup.done": "Setup complete",
   "shift.open": "Open shift", "shift.close": "Close shift", "shift.openingFloat": "Opening float", "shift.counted": "Counted cash", "shift.expected": "Expected", "shift.variance": "Variance", "shift.xReport": "X report", "shift.none": "No open shift",
   "pos.scanOrSearch": "Scan barcode or search item (F2)", "pos.cart": "Cart", "pos.subtotal": "Subtotal", "pos.tax": "Tax", "pos.total": "Total", "pos.tendered": "Tendered", "pos.change": "Change",
