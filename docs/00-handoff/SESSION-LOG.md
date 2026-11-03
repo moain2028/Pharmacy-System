@@ -87,3 +87,16 @@
 - اختبار PRO_RATA للوكيل كان يتوقع 30k/20k لتوزيع 50k على 80k/60k — الصحيح 28,571.43/21,428.57 (Half-Up) وصُحّح الاختبار لا الكود.
 **PR:** #5 (genspark_ai_developer → main).
 **التالي:** PROJECT-STATE §2 (Returns/Customers → Purchasing → Treasury/Reports → web → desktop).
+
+---
+
+## Session #6 — 2026-11-03 — إكمال API بالكامل + أساس الويب + 10 وكلاء (PR #6)
+**الطلب:** "اشتغل وبنفس القوة… وظّف عدة وكلاء… إذا توقف أي وكيل خلّيه يكمل… لا تتوقف."
+**الوكلاء:** 5 لواجهة API (D1 Opus، D2 Fable، D3 Astra→فشل بأسئلة بدل كود→أُعيد كـ D3b بإجابات دقيقة ونجح، D4 Opus، D5 Fable) + 5 للويب (E1 POS Opus، E2 Catalog/Inventory Fable، E3 Sales/Returns/Customers Fable، E4 Purchasing/Payables/Cash Astra، E5 Reports/Accounting/Users/Settings Opus) — الأخيرون **قيد التشغيل عند إغلاق الجلسة**؛ مخرجاتهم ستكون في `.tmp_agents/E*.json`.
+**ما تم (كله مختبر وأخضر):**
+- API: Customers + Sales Returns (D1)، Suppliers/PO/GRN (D2)، Supplier invoices/Purchase returns/Supplier payments/Ledger (D3b)، Treasury: receipts/expenses/transfers/FX/owner/opening balances (D4)، Reports: TB/P&L/BS/sales/inventory/expiry/aging/cashbook/audit/dashboard (D5). **89 E2E، 84 مسارًا، tsc strict + eslint نظيفان.**
+- بنيتي: `shared/journal.ts` (persistEntry/rateFor/convertScaled/toBase)، مغلّف الأخطاء ثنائي اللغة `{code, message(ar/en), messageEn, requestId}`، توحيد ثوابت الصلاحيات domain↔catalogue (7 اختلافات)، Backup (pg_dump custom + sha256 + verify/download/restore بتأكيد صريح + prune)، OpenAPI على `/api/docs`.
+- web: scaffold React 18 + Vite 6 + Tailwind، عميل API مع تحديث التوكن، مخزن مصادقة مع مطابقة الصلاحيات، i18n ar/en مع اختبار تطابق المفاتيح، Shell RTL/LTR، دخول، معالج إعداد، لوحة، راوتر بتحميل كسول للوحدات.
+**أخطاء الوكلاء التي اكتشفتها المراجعة (للعبرة):** `isActive` بدل `active` مخفي بـ `as unknown as`؛ حركات FX بلا rate snapshot؛ `Money.eq` غير موجود؛ تمرير خصم صفري لقاعدة ترحيل ترفض الصفر؛ اختبارات تقرأ `body.code` بدل `body.error.code`؛ `roleCodes` بدل `roleIds` (خطأ في تعليماتي أنا). أيضًا `dist/` القديم لحزمة domain سبّب أخطاء وهمية — **أعد بناء domain قبل فحص API**.
+**PR:** #6.
+**التالي:** PROJECT-STATE §2 (دمج E1–E5 → تشغيل حي → desktop).
