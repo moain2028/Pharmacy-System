@@ -26,16 +26,27 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get("tab");
   const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [closed, setClosed] = useState<Record<string, boolean>>(() => { try { return JSON.parse(localStorage.getItem("pharmacore.nav.closed") ?? "{}") as Record<string, boolean>; } catch { return {}; } });
+  const toggleSection = (key: string, active: boolean) => setClosed((c) => { const next: Record<string, boolean> = { ...c, [key]: active ? false : !(c[key] ?? false) }; localStorage.setItem("pharmacore.nav.closed", JSON.stringify(next)); return next; });
   return (
-    <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-3 scrollbar-thin" aria-label={t("nav.main")}>
+    <nav className="flex-1 space-y-2 overflow-y-auto px-3 py-3 scrollbar-thin" aria-label={t("nav.main")}>
       {NAV_SECTIONS.map((g) => {
         const items = g.items.filter((n) => !n.perm || can(n.perm));
         if (items.length === 0) return null;
         const hid = `nav-${g.key.replace(/\W/g, "-")}`;
+        const sectionActive = items.some((n) => isActivePath(pathname, n.to));
+        const sectionOpen = sectionActive || !(closed[g.key] ?? false);
         return (
           <div key={g.key}>
-            <h2 id={hid} className="mb-1 px-3 text-[11px] font-semibold text-ink-500">{t(g.key)}</h2>
-            <ul aria-labelledby={hid} className="space-y-0.5">
+            {/* Section header = disclosure button: chevron rotates, whole group collapses. Active section cannot be collapsed (you never lose your place). */}
+            <h2 className="mb-0.5">
+              <button type="button" id={hid} aria-expanded={sectionOpen} aria-controls={`${hid}-list`} onClick={() => toggleSection(g.key, sectionActive)}
+                className="flex min-h-[2.25rem] w-full items-center justify-between rounded-md px-3 text-[11px] font-semibold text-ink-500 hover:bg-ink-100 hover:text-ink-700">
+                <span>{t(g.key)}</span>
+                <Icons.chevron className={`h-3.5 w-3.5 transition-transform ${sectionOpen ? "rotate-90" : "rtl:rotate-180"}`} aria-hidden="true" />
+              </button>
+            </h2>
+            {sectionOpen && <ul id={`${hid}-list`} aria-labelledby={hid} className="space-y-0.5">
               {items.map((n) => {
                 const Icon = Icons[n.icon];
                 const active = isActivePath(pathname, n.to);
@@ -75,7 +86,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                   </li>
                 );
               })}
-            </ul>
+            </ul>}
           </div>
         );
       })}
