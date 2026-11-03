@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./i18n/register-features";
 import { AppRouter } from "./app/router";
 import { useAuth } from "./lib/auth";
 import { dirOf } from "./i18n";

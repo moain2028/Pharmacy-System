@@ -1,0 +1,31 @@
+export const usersAr: Record<string, string> = {
+  "users.title": "المستخدمون والصلاحيات", "users.tab.users": "المستخدمون", "users.tab.roles": "الأدوار",
+  "users.new": "مستخدم جديد", "users.edit": "تعديل المستخدم", "users.username": "اسم الدخول", "users.displayName": "الاسم الظاهر",
+  "users.password": "كلمة المرور", "users.passwordHintEdit": "اتركها فارغة للإبقاء على كلمة المرور الحالية", "users.pin": "الرمز السري (PIN)",
+  "users.pinHint": "من 4 إلى 12 رقمًا، يُستخدم لموافقات المدير", "users.locale": "اللغة", "users.roles": "الأدوار", "users.active": "الحساب مفعّل",
+  "users.overrides": "استثناءات الصلاحيات", "users.overridesTitle": "استثناءات الصلاحيات — {name}",
+  "users.overridesNote": "الاستثناءات تُضاف فوق صلاحيات الأدوار وتستبدل الاستثناءات السابقة بالكامل عند الحفظ.",
+  "users.inherit": "حسب الدور", "users.allow": "سماح", "users.deny": "منع", "users.limit": "الحد", "users.filterPerms": "بحث في الصلاحيات",
+  "users.saved": "تم الحفظ", "users.err.username": "اسم الدخول من 3 إلى 64 حرفًا لاتينيًا أو أرقامًا أو . _ -", "users.err.displayName": "الاسم الظاهر مطلوب",
+  "users.err.password": "كلمة المرور يجب ألا تقل عن 8 أحرف", "users.err.pin": "الرمز السري من 4 إلى 12 رقمًا", "users.err.roles": "اختر دورًا واحدًا على الأقل",
+  "users.err.limit": "الحد غير صالح للصلاحية {perm} (عدد صحيح)", "users.lang.ar": "العربية", "users.lang.en": "English",
+  "users.role.new": "دور جديد", "users.role.code": "رمز الدور", "users.role.name": "اسم الدور", "users.role.nameAr": "الاسم بالعربية", "users.role.nameEn": "الاسم بالإنجليزية",
+  "users.role.permissions": "الصلاحيات", "users.role.count": "عدد الصلاحيات", "users.role.err.code": "الرمز بحروف لاتينية كبيرة وأرقام و _ (2–40)",
+  "users.role.err.name": "الاسمان العربي والإنجليزي مطلوبان", "users.role.saved": "تم إنشاء الدور",
+};
+
+export const usersEn: Record<string, string> = {
+  "users.title": "Users & roles", "users.tab.users": "Users", "users.tab.roles": "Roles",
+  "users.new": "New user", "users.edit": "Edit user", "users.username": "Username", "users.displayName": "Display name",
+  "users.password": "Password", "users.passwordHintEdit": "Leave empty to keep the current password", "users.pin": "PIN",
+  "users.pinHint": "4–12 digits, used for manager approvals", "users.locale": "Language", "users.roles": "Roles", "users.active": "Account active",
+  "users.overrides": "Overrides", "users.overridesTitle": "Permission overrides — {name}",
+  "users.overridesNote": "Overrides apply on top of role permissions and fully replace previous overrides when saved.",
+  "users.inherit": "From role", "users.allow": "Allow", "users.deny": "Deny", "users.limit": "Limit", "users.filterPerms": "Filter permissions",
+  "users.saved": "Saved", "users.err.username": "Username: 3–64 latin letters, digits or . _ -", "users.err.displayName": "Display name is required",
+  "users.err.password": "Password must be at least 8 characters", "users.err.pin": "PIN must be 4–12 digits", "users.err.roles": "Select at least one role",
+  "users.err.limit": "Invalid limit for {perm} (integer)", "users.lang.ar": "العربية", "users.lang.en": "English",
+  "users.role.new": "New role", "users.role.code": "Role code", "users.role.name": "Role name", "users.role.nameAr": "Arabic name", "users.role.nameEn": "English name",
+  "users.role.permissions": "Permissions", "users.role.count": "Permissions", "users.role.err.code": "Code: uppercase letters, digits and _ (2–40)",
+  "users.role.err.name": "Arabic and English names are required", "users.role.saved": "Role created",
+};

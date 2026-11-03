@@ -113,3 +113,12 @@
 - وكلاء الويب الكبار تعطّلوا (بث متوقف 27 دقيقة) → أُعيد إطلاقهم كسبع مهام أصغر؛ قيد التشغيل عند الإغلاق.
 - حادثة: توكن التطبيق فقد صلاحية الدفع؛ استُخدم توكن المالك. **يجب إلغاؤه.**
 **PR:** #7.
+
+## Session #8 — 2026-11-03 (continuation, same day)
+- Merged PR #7 (smoke harness, /auth/me).
+- Integrated UI agent outputs: **sales** (list/detail/80mm receipt), **returns** (quote → confirm, approver modal), **customers** (list/detail/statement/receive payment), **accounting**, **users**, **settings** (backup). 34 new files.
+- `components/ui.tsx` Field props widened for exactOptionalPropertyTypes; `i18n/register-features.ts` registers all feature dictionaries (imported in `main.tsx`).
+- Web: tsc 0 errors, eslint clean, vitest 33/33, `vite build` OK (277 kB gz 90 kB).
+- Still running / not yet integrated: E1-pos, E2a-items, E2b-inventory-expiry, E5a-reports (`.tmp_agents/jobs_web2.json`; relaunch with smaller max_tokens if stalled).
+- Open: smoke step "on hand 480 SSU after GRN (got 0)" — investigate GRN-via-PO path in `purchasing.service.ts` (stock_movements/lot creation) vs `GET /inventory/items/:id/balances` shape.
+- Security: `origin` reset to tokenless URL; owner PAT must be revoked by owner.
