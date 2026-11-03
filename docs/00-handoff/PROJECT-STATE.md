@@ -11,7 +11,7 @@
 |---|---|
 | المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~70%** — domain مكتمل، db مكتمل، **api مكتمل** (Identity/Catalog/Inventory/Sales/Shifts/Returns/Customers/Purchasing/Payables/Treasury/Reports/Backup/OpenAPI/i18n — 89 E2E)؛ web: الأساس جاهز + 5 وكلاء واجهة قيد التشغيل؛ باقي دمج شاشات الويب + desktop |
+| نسبة الإنجاز التقديرية للمرحلة | **~80%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
 | هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (89 اختبار E2E، 84 مسارًا، OpenAPI على /api/docs)، `apps/web` (أساس: عميل API، مخزن مصادقة، i18n ar/en، Shell RTL/LTR، دخول، معالج إعداد، لوحة) |
 | الفرع النشط | `genspark_ai_developer` |
 | آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
@@ -26,11 +26,11 @@
 - `apps/api` NestJS/Fastify: Identity (Argon2id، JWT + refresh دوّار مع كشف إعادة الاستخدام، قفل بعد 5 محاولات، صلاحيات `resource.action` + overrides، معالج الإعداد الأولي)، Catalog (أصناف + سلّم وحدات مرن + باركود GS1 + أسعار + سعر رسمي + أسعار صرف)، Inventory (استلام، أرصدة، FEFO preview، حالات الدفعات، تسويات، تحويلات، كاردكس، worklist الانتهاء). **36 اختبار E2E** على PostgreSQL حقيقي.
 
 **المهمة التالية بالضبط (بالترتيب):**
-1. **دمج مخرجات وكلاء الواجهة E1–E5** (ملفات `.tmp_agents/E1-pos.json`, `E2-catalog-inventory.json`, `E3-sales-returns-customers.json`, `E4-purchasing-payables-cash.json`, `E5-reports-accounting-users-settings.json`؛ السجل `.tmp_agents/run_web1.log`): لكل واحد `python3 tools/agents/salvage.py <json> --write --root .` → `cd apps/web && pnpm exec tsc --noEmit && pnpm exec eslint src --max-warnings=0 && pnpm exec vitest run`. متوقع إصلاحات صغيرة: أسماء حقول الاستجابة، مفاتيح i18n (ادمج `*.keys.ts` في `src/i18n/ar.ts`/`en.ts` أو حمّلها في `DICTS`)، استيراد `@/`. إن فشل وكيل (مخرج صغير/أسئلة بدل كود كما حدث مع D3) أعد تشغيله بإجابات دقيقة (انظر `build_jobs_api.py` نمط D3b).
-2. **تشغيل الويب على API حقيقي**: `pnpm --filter @pharmacore/api dev` (PORT 3100) + `API_URL=http://localhost:3100 pnpm --filter @pharmacore/web dev` → معالج الإعداد → دخول → POS. اختبر بيعًا كاملًا بلوحة المفاتيح وطباعة إيصال.
-3. **apps/desktop (Tauri 2)**: تضمين PostgreSQL 16 portable كخدمة Windows (`pg_ctl register`)، تشغيل API كـ sidecar (Node SEA أو pkg)، إنشاء `JWT_SECRET` لكل جهاز، `BACKUP_DIR=%ProgramData%\PharmaCore\backups`، مثبّت NSIS/MSI بعربية/إنجليزية، أيقونة، تحديثات.
-4. **استيراد/تصدير CSV/Excel** في API (أصناف، عملاء، موردون، جرد افتتاحي) — endpoint `POST /import/items` بملف CSV مع معاينة أخطاء صفّية.
-5. **تجربة في الصيدلية + تصحيحات**، ثم وسم إصدار v0.1.0.
+1. **دمج مخرجات وكلاء الواجهة** — الدفعة الأولى (E1–E5 الكبيرة) **تعطّلت بعد 27 دقيقة** (بث متوقف) فقُتلت وأُعيد إطلاقها كسبع مهام أصغر (`.tmp_agents/jobs_web2.json` → `E1-pos`, `E2a-items`, `E2b-inventory-expiry`, `E3a-sales-returns`, `E3b-customers`, `E5a-reports`, `E5b-accounting-users-settings`؛ السجل `.tmp_agents/run_web2.log`). E4 نجح ودُمج. لكل ملف ناتج: `python3 tools/agents/salvage.py <json> --write --root .` → `cd apps/web && pnpm exec tsc --noEmit && pnpm exec eslint src --max-warnings=0 && pnpm exec vitest run` (اختبار `keys-parity` يفرض تطابق قواميس i18n). إن لم تُنتج مهمة مخرجًا، أعد تشغيلها منفردة بـ `max_tokens` ≤ 16000.
+2. **إكمال `tools/smoke/pharmacy-day.mjs`** (يوم كامل في الصيدلية ضد خادم حي؛ يعمل حتى خطوة GRN). الخطوة التالية تفشل لأن `GET /inventory/items/:id/balances` يُرجع شكلاً غير المتوقع بعد GRN المرتبط بأمر شراء — تحقق هل GRN يكتب `stock_movements` بالفعل عند التمرير عبر PO (افحص `purchasing.service.ts` → `receive`)؛ أكمل بقية الخطوات حتى `✅ pharmacy-day smoke passed` ثم أضفه لـ CI كخطوة اختيارية.
+3. **تشغيل حي**: `/tmp/run_api.sh` نمط التشغيل (NODE_ENV=production, STATIC_DIR=apps/web/dist, ENABLE_DOCS=true) — الـ API يخدم SPA على `/` و docs على `/api/docs`؛ تحقق من POS كاملًا بلوحة المفاتيح بعد دمج E1.
+4. **desktop**: على جهاز ويندوز: `pnpm -w build` → `pnpm --filter @pharmacore/desktop sea` → `fetch:pg` → `tauri build` (يتطلب Rust + NSIS). راجع `apps/desktop/README.md`. ملاحظة: `build-sea.mjs` يحتاج `postject` (`npm i -g postject`).
+5. تجربة في الصيدلية → تصحيحات → وسم v0.1.0.
 
 ## 3. خارطة المراحل الكلية
 | # | المرحلة | الحالة | المخرجات الرئيسية |
