@@ -111,7 +111,7 @@ export class SetupService {
         (${tenantId}, 'UTIL', 'كهرباء وماء', 'Utilities', '5120'), (${tenantId}, 'TELECOM', 'اتصالات', 'Telecom', '5130'),
         (${tenantId}, 'TRANSPORT', 'نقل', 'Transport', '5140'), (${tenantId}, 'FEES', 'رسوم وتراخيص', 'Fees & licenses', '5150'),
         (${tenantId}, 'OTHER', 'أخرى', 'Other', '5190')`;
-      for (const [type, prefix] of [["SALES_INVOICE", "INV-"], ["SALES_RETURN", "RET-"], ["PURCHASE_ORDER", "PO-"], ["GOODS_RECEIPT", "GRN-"], ["SUPPLIER_INVOICE", "SINV-"], ["PURCHASE_RETURN", "PRET-"], ["PAYMENT", "PAY-"], ["EXPENSE", "EXP-"], ["STOCKTAKE", "STK-"], ["ADJUSTMENT", "ADJ-"], ["JOURNAL", "JE-"]] as const) {
+      for (const [type, prefix] of [["SALES_INVOICE", "INV-"], ["SALES_RETURN", "RET-"], ["PURCHASE_ORDER", "PO-"], ["GOODS_RECEIPT", "GRN-"], ["SUPPLIER_INVOICE", "SINV-"], ["PURCHASE_RETURN", "PRET-"], ["PAYMENT", "PAY-"], ["EXPENSE", "EXP-"], ["STOCKTAKE", "STK-"], ["ADJUSTMENT", "ADJ-"], ["JOURNAL", "JE-"], ["ITEM", "IT-"], ["INTERNAL_BARCODE", ""]] as const) {
         await tx`INSERT INTO numbering_series (tenant_id, document_type, period_key, prefix, padding) VALUES (${tenantId}, ${type}, '', ${prefix}, 6)`;
       }
       await tx`INSERT INTO audit_log (tenant_id, actor_user_id, action, entity_type, entity_id, after_data)
