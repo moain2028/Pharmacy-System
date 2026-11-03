@@ -19,12 +19,12 @@ export function ReturnLines({ lines, returned, qty, errors, mode, onQty }: Props
         const sold = Number(l.qty_ssu); const ret = returned[l.id] ?? 0; const max = sold - ret; const err = errors[l.id];
         return (
           <tr key={l.id}>
-            <td>{name(l)}<div className="text-xs text-slate-500">{t("item.factor")}: <span className="num">{l.factor_to_ssu}</span></div></td>
+            <td>{name(l)}<div className="text-xs text-ink-500">{t("item.factor")}: <span className="num">{l.factor_to_ssu}</span></div></td>
             <td className="num">{fmtQ(sold, l)}</td><td className="num">{fmtQ(ret, l)}</td><td className="num font-medium">{fmtQ(max, l)}</td>
             <td>
-              <input type="number" inputMode="decimal" min={0} step={mode === "SSU" ? 1 : "any"} className={`input num w-28 ${err ? "border-red-500" : ""}`} aria-label={`${t("ret.returnQty")} ${name(l)}`}
+              <input type="number" inputMode="decimal" min={0} step={mode === "SSU" ? 1 : "any"} className={`input num w-28 ${err ? "border-danger-500" : ""}`} aria-label={`${t("ret.returnQty")} ${name(l)}`}
                 value={qty[l.id] ?? ""} disabled={max <= 0} onChange={(e) => onQty(l.id, e.target.value)} />
-              {err && <div role="alert" className="mt-1 text-xs text-red-600">{t(err)}</div>}
+              {err && <div role="alert" className="mt-1 text-xs text-danger-700">{t(err)}</div>}
             </td>
           </tr>);
       })}</tbody>

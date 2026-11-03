@@ -24,7 +24,7 @@ export function useDebounce<T>(value: T): T { const [v, set] = useState(value); 
 export const currencies = ["YER_OLD", "YER_NEW", "SAR", "USD"] as const;
 export function positiveMoney(v: string, currency: string, zero = false): string | null { const n = parseToMinor(v, currency); return n !== null && (zero ? BigInt(n) >= 0n : BigInt(n) > 0n) ? n : null; }
 export function integer(v: string, min = 0, max = Number.MAX_SAFE_INTEGER): number | null { const n = Number(v); return /^\d+$/.test(v) && Number.isSafeInteger(n) && n >= min && n <= max ? n : null; }
-export function Invalid({ show }: { show: boolean }) { const { t } = useT(); return show ? <div role="alert" className="rounded bg-red-50 p-3 text-red-800">{t("purchasing.invalid")}</div> : null; }
+export function Invalid({ show }: { show: boolean }) { const { t } = useT(); return show ? <div role="alert" className="rounded bg-danger-50 p-3 text-danger-700">{t("purchasing.invalid")}</div> : null; }
 export function Input({ label, value, onChange, type = "text", required = false, autoFocus = false, maxLength }: { label: string; value: string; onChange: (v: string) => void; type?: string | undefined; required?: boolean | undefined; autoFocus?: boolean | undefined; maxLength?: number | undefined }) {
   const { t } = useT(); return <Field label={t(label)}><input className={`input w-full ${type === "date" ? "num" : ""}`} value={value} onChange={e => onChange(e.target.value)} type={type} required={required} autoFocus={autoFocus} maxLength={maxLength} /></Field>;
 }

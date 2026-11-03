@@ -57,7 +57,7 @@ function RoleForm({ onClose }: { onClose: () => void }) {
     <Modal open wide onClose={onClose} title={t("users.role.new")}
       footer={<><button type="button" className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button><button type="submit" form="role-form" className="btn-primary" disabled={m.isPending}>{t("common.save")}</button></>}>
       <form id="role-form" onSubmit={submit} noValidate className="grid gap-3">
-        {err && <p role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700">{err}</p>}
+        {err && <p role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700">{err}</p>}
         <div className="grid grid-cols-3 gap-3">
           <Field label={t("users.role.code")}><input className="input" dir="ltr" autoFocus value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} /></Field>
           <Field label={t("users.role.nameAr")}><input className="input" dir="rtl" value={nameAr} onChange={(e) => setNameAr(e.target.value)} /></Field>
@@ -69,7 +69,7 @@ function RoleForm({ onClose }: { onClose: () => void }) {
             {groups.map(([g, list]) => {
               const all = list.every((p) => sel.includes(p));
               return (
-                <fieldset key={g} className="rounded-md border border-slate-200 p-2">
+                <fieldset key={g} className="rounded-md border border-ink-200 p-2">
                   <legend className="px-1"><label className="flex items-center gap-2 font-medium"><input type="checkbox" checked={all} onChange={(e) => toggleGroup(list, e.target.checked)} /><span dir="ltr">{g}</span></label></legend>
                   {list.map((p) => <label key={p} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={sel.includes(p)} onChange={() => toggle(p)} /><span dir="ltr">{p}</span></label>)}
                 </fieldset>

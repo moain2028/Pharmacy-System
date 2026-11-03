@@ -26,7 +26,7 @@ export function CoaTab() {
         <thead><tr><th>{t("acc.code")}</th><th>{t("acc.name")}</th><th>{t("acc.debit")}</th><th>{t("acc.credit")}</th><th>{t("acc.balance")}</th></tr></thead>
         {groups.map(([type, rows]) => (
           <tbody key={type}>
-            <tr><th colSpan={5} className="bg-slate-50 text-start">{t(`acc.type.${type}`)}</th></tr>
+            <tr><th colSpan={5} className="bg-ink-50 text-start">{t(`acc.type.${type}`)}</th></tr>
             {rows.map((r) => (
               <tr key={r.code}>
                 <td className="num">{r.code}</td><td>{locale === "ar" ? r.name_ar : r.name_en}</td>

@@ -54,7 +54,7 @@ function OverrideModal({ flags, onCancel, onSubmit }: { flags: Flags; onCancel: 
 }
 
 function Stat({ label, value, tone = "" }: { label: string; value: string; tone?: string }) {
-  return <div className="rounded-md bg-slate-50 p-2"><div className="text-xs text-slate-500">{label}</div><div className={`num text-xl font-bold ${tone}`}>{value}</div></div>;
+  return <div className="rounded-md bg-ink-50 p-2"><div className="text-xs text-ink-500">{label}</div><div className={`num text-xl font-bold ${tone}`}>{value}</div></div>;
 }
 
 function Receipt({ r, lines }: { r: SaleResult; lines: CartLine[] }) {
@@ -124,9 +124,9 @@ export default function PayModal({ body, total, idempotencyKey, customer, lines,
     return (
       <Modal open onClose={onDone} title={t("pos.posted")}>
         <div className="text-center">
-          <div className="text-sm text-slate-500">{t("pos.invoice")}</div>
+          <div className="text-sm text-ink-500">{t("pos.invoice")}</div>
           <div className="num text-3xl font-bold">{result.number}</div>
-          <div className="mt-4 text-sm text-slate-500">{t("pos.changeDue")}</div>
+          <div className="mt-4 text-sm text-ink-500">{t("pos.changeDue")}</div>
           <div className="num text-4xl font-bold text-green-700">{moneyText(result.settlement.change, locale)}</div>
         </div>
         <div className="mt-4 flex justify-center gap-2">
@@ -167,11 +167,11 @@ export default function PayModal({ body, total, idempotencyKey, customer, lines,
               {(r.method === "CARD" || r.method === "WALLET") && (
                 <Field label={t("pos.paymentRef")}><input className="input w-32" value={r.ref} onChange={(e) => upd(r.id, { ref: e.target.value })} /></Field>
               )}
-              {rows.length > 1 && <button type="button" aria-label={t("pos.removeTender")} className="text-red-500" onClick={() => setRows((rs) => rs.filter((x) => x.id !== r.id))}>✕</button>}
+              {rows.length > 1 && <button type="button" aria-label={t("pos.removeTender")} className="text-danger-500" onClick={() => setRows((rs) => rs.filter((x) => x.id !== r.id))}>✕</button>}
             </div>
           ))}
           <button type="button" className="btn-secondary" onClick={() => setRows((rs) => [...rs, { id: newKey(), method: "CASH", currency: cur, text: "", ref: "" }])}>{t("pos.addTender")}</button>
-          {creditBad && <p role="alert" className="text-sm text-red-600">{t("pos.creditNeedsCustomer")}</p>}
+          {creditBad && <p role="alert" className="text-sm text-danger-700">{t("pos.creditNeedsCustomer")}</p>}
           <div className="flex justify-end gap-2">
             <button type="button" className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button>
             <button type="submit" className="btn-primary" disabled={invalid || creditBad || m.isPending}>{t("pos.confirmPay")}</button>

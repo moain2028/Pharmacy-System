@@ -21,21 +21,28 @@ interface Dash {
 function Money({ minor, currency, locale, negativeTone = true }: { minor: string; currency: string; locale: "ar" | "en"; negativeTone?: boolean }) {
   const amount = fmtMinor(minor, currency, locale, false);
   const neg = BigInt(minor) < 0n;
-  return <span className={`inline-flex items-baseline gap-1 ${neg && negativeTone ? "text-rose-700" : ""}`}><span className="num">{amount}</span><span className="text-xs font-semibold text-ink-500">{CURRENCY_LABEL[currency]?.[locale] ?? currency}</span></span>;
+  return (
+    <span className={`flex flex-wrap items-baseline gap-x-1.5 ${neg && negativeTone ? "text-rose-700" : ""}`}>
+      <span className="num text-[clamp(1.25rem,5.2vw,1.875rem)] font-extrabold leading-none tracking-tight">{amount}</span>
+      <span className="whitespace-nowrap text-[11px] font-bold text-ink-500">{CURRENCY_LABEL[currency]?.[locale] ?? currency}</span>
+    </span>
+  );
 }
 
 function Stat({ icon, label, value, sub, tone = "brand", to }: { icon: IconName; label: string; value: ReactNode; sub?: ReactNode; tone?: "brand" | "amber" | "rose" | "ink"; to?: string }) {
   const Icon = Icons[icon];
   const ring = { brand: "bg-brand-50 text-brand-700", amber: "bg-amber-50 text-amber-700", rose: "bg-rose-50 text-rose-700", ink: "bg-ink-100 text-ink-700" }[tone];
   const body = (
-    <div className="card flex h-full items-start gap-3 transition hover:shadow-pop">
-      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${ring}`}><Icon className="h-5 w-5" /></span>
-      <div className="min-w-0 flex-1">
-        <div className="line-clamp-2 text-xs font-semibold leading-snug text-ink-500">{label}</div>
-        <div className="stat-value mt-1">{value}</div>
-        {sub && <div className="mt-1 line-clamp-2 text-xs leading-snug text-ink-500">{sub}</div>}
+    <div className="card flex h-full flex-col gap-3 p-4 transition hover:shadow-pop">
+      <div className="flex items-start justify-between gap-2">
+        <div className="line-clamp-2 min-h-[2.25rem] text-xs font-semibold leading-[1.15rem] text-ink-500">{label}</div>
+        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${ring}`}><Icon className="h-[18px] w-[18px]" /></span>
       </div>
-      {to && <Icons.chevron className="mt-1 h-4 w-4 shrink-0 text-ink-300 rtl:rotate-180" />}
+      <div className="min-w-0 text-ink-900">{typeof value === "number" ? <span className="num text-[clamp(1.5rem,6vw,2rem)] font-extrabold leading-none tracking-tight">{value}</span> : value}</div>
+      <div className="mt-auto flex items-center justify-between gap-2 text-xs text-ink-500">
+        <span className="line-clamp-1">{sub}</span>
+        {to && <Icons.chevron className="h-4 w-4 shrink-0 text-ink-300 rtl:rotate-180" />}
+      </div>
     </div>
   );
   return to ? <Link to={to} className="block rounded-xl">{body}</Link> : body;
@@ -84,7 +91,10 @@ export default function Dashboard() {
           <div className="text-sm text-ink-500">{dateLabel}</div>
           <h1 className="text-2xl sm:text-3xl">{greeting}{me?.displayName ? `، ${me.displayName.split(" ")[0]}` : ""}</h1>
         </div>
-        <button className="btn-secondary btn-sm" onClick={() => void q.refetch()} disabled={q.isFetching}><Icons.refresh className={`h-4 w-4 ${q.isFetching ? "animate-spin" : ""}`} />{t("common.retry")}</button>
+        <div className="flex items-center gap-3 text-xs text-ink-500">
+          {q.dataUpdatedAt > 0 && <span>{t("dash.updatedAt")} <span className="num">{new Date(q.dataUpdatedAt).toLocaleTimeString(locale === "ar" ? "ar-YE-u-nu-latn" : "en-GB", { hour: "2-digit", minute: "2-digit" })}</span></span>}
+          <button className="btn-secondary btn-sm" onClick={() => void q.refetch()} disabled={q.isFetching} aria-label={t("common.refresh")}><Icons.refresh className={`h-4 w-4 ${q.isFetching ? "animate-spin" : ""}`} />{t("common.refresh")}</button>
+        </div>
       </header>
 
       {/* Alerts first: the thing a pharmacist must not miss. */}

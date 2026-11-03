@@ -9,10 +9,10 @@ const DEST_TONE: Record<string, "green" | "amber" | "red" | "slate"> = { AVAILAB
 export function QuotePanel({ quote, loading, error }: { quote: ReturnQuote | undefined; loading: boolean; error: unknown }) {
   const { t, locale } = useT();
   if (error) return <ErrorBox error={error} />;
-  if (!quote) return loading ? <Spinner /> : <div className="p-4 text-sm text-slate-500">{t("ret.noLines")}</div>;
+  if (!quote) return loading ? <Spinner /> : <div className="p-4 text-sm text-ink-500">{t("ret.noLines")}</div>;
   return (
     <div className={loading ? "opacity-60" : ""}>
-      <div className="flex items-baseline justify-between"><span className="text-sm text-slate-500">{t("ret.refundTotal")}</span><span className="num text-2xl font-semibold">{fmtMoney(quote.refundTotal, locale)}</span></div>
+      <div className="flex items-baseline justify-between"><span className="text-sm text-ink-500">{t("ret.refundTotal")}</span><span className="num text-2xl font-semibold">{fmtMoney(quote.refundTotal, locale)}</span></div>
       <div className="mt-3 text-sm font-medium">{t("ret.refunds")}</div>
       <table><tbody>{quote.refunds.map((r, i) => <tr key={i}><td>{t(METHOD_KEY[r.method] ?? "pos.cash")}</td><td className="num">{fmtMoney(r.amount, locale)}</td></tr>)}</tbody></table>
       <div className="mt-3 text-sm font-medium">{t("ret.lotDest")}</div>

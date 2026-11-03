@@ -15,7 +15,7 @@ export function fmtMinor(amountMinor: string | bigint | number, currency: string
   const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   const body = d > 0 ? `${grouped}.${frac}` : grouped;
   const sym = withSymbol ? ` ${CURRENCY_LABEL[currency]?.[locale] ?? currency}` : "";
-  return `${neg ? "-" : ""}${body}${sym}`;
+  return `${neg ? "\u2212" : ""}${body}${sym}`;
 }
 export const fmtMoney = (m: MoneyJson | null | undefined, locale: "ar" | "en" = "ar") => (m ? fmtMinor(m.amountMinor, m.currency, locale) : "—");
 

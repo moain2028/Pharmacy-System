@@ -70,5 +70,5 @@ function TopItems({ from, to, cur }: { from: string; to: string; cur: string }) 
     { key: "name", title: t("reports.col.item") }, { key: "qty", title: t("reports.col.qty"), num: true },
     { key: "amount", title: t("reports.col.total"), money: true, currency: cur },
   ];
-  return <ReportView title={t("reports.topItems")} filename="top-items" loading={q.isLoading} error={q.error} onRetry={() => void q.refetch()} columns={cols} rows={rows} />;
+  return <ReportView period={`${from} → ${to}`} title={t("reports.topItems")} filename="top-items" loading={q.isLoading} error={q.error} onRetry={() => void q.refetch()} columns={cols} rows={rows} />;
 }

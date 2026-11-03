@@ -51,8 +51,8 @@ function Brand({ compact = false }: { compact?: boolean }) {
   const { t } = useT();
   return (
     <div className="flex items-center gap-2.5">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-sm"><Icons.pill className="h-5 w-5" /></span>
-      {!compact && <div className="leading-tight"><div className="text-base font-extrabold text-ink-900">{t("app.name")}</div><div className="text-[11px] font-medium text-ink-500">{t("app.tagline")}</div></div>}
+      <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-700 text-white shadow-sm"><Icons.pill className="h-5 w-5" /></span>
+      {!compact && <div className="leading-tight"><div className="text-base font-bold text-ink-900">{t("app.name")}</div><div className="text-[11px] font-medium text-ink-500">{t("app.tagline")}</div></div>}
     </div>
   );
 }
@@ -68,7 +68,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
         if (items.length === 0) return null;
         return (
           <div key={g.key}>
-            <div className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wider text-ink-400">{t(g.key)}</div>
+            <div className="mb-1.5 px-3 text-[11px] font-semibold text-ink-500">{t(g.key)}</div>
             <ul className="space-y-0.5">
               {items.map((n) => {
                 const Icon = Icons[n.icon];
@@ -76,8 +76,8 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                 return (
                   <li key={n.to}>
                     <NavLink to={n.to} end={n.to === "/"} onClick={onNavigate} aria-current={active ? "page" : undefined}
-                      className={`group flex min-h-[2.5rem] items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${active ? "bg-brand-600 text-white shadow-sm" : "text-ink-700 hover:bg-ink-100 hover:text-ink-900"}`}>
-                      <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-white" : "text-ink-400 group-hover:text-brand-600"}`} />
+                      className={`group relative flex min-h-[2.75rem] items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${active ? "bg-brand-50 text-brand-800 before:absolute before:inset-y-2 before:start-0 before:w-[3px] before:rounded-e before:bg-brand-700" : "text-ink-700 hover:bg-ink-100 hover:text-ink-900"}`}>
+                      <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-brand-700" : "text-ink-500 group-hover:text-brand-700"}`} />
                       <span className="truncate">{t(n.key)}</span>
                     </NavLink>
                   </li>
@@ -92,8 +92,8 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function UserBox({ onAfter }: { onAfter?: () => void }) {
-  const { t, locale } = useT();
-  const { me, logout, setLocale } = useAuth();
+  const { t } = useT();
+  const { me, logout } = useAuth();
   const nav = useNavigate();
   const initials = (me?.displayName ?? "?").trim().slice(0, 1);
   return (
@@ -103,7 +103,7 @@ function UserBox({ onAfter }: { onAfter?: () => void }) {
         <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-ink-900">{me?.displayName}</div><div className="truncate text-xs text-ink-500">@{me?.username}</div></div>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <button className="btn-ghost btn-sm justify-start" onClick={() => { setLocale(locale === "ar" ? "en" : "ar"); onAfter?.(); }}><Icons.globe className="h-4 w-4" />{t("nav.language")}</button>
+        <NavLink to="/settings" onClick={onAfter} className="btn-ghost btn-sm justify-start"><Icons.settings className="h-4 w-4" />{t("nav.settings")}</NavLink>
         <button className="btn-ghost btn-sm justify-start text-rose-700 hover:bg-rose-50" onClick={() => { logout(); nav("/login"); }}><Icons.logout className="h-4 w-4" />{t("nav.logout")}</button>
       </div>
     </div>

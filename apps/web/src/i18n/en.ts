@@ -6,7 +6,7 @@ export const en: Record<string, string> = {
   "dash.expiring90": "Lots expiring within 90 days", "dash.units": "units", "dash.lowStock": "Items below reorder point", "dash.belowReorder": "Need reordering",
   "dash.quickActions": "Quick actions", "dash.receiveGoods": "Receive goods", "dash.newItem": "New item", "dash.recordExpense": "Record expense",
   "dash.cashByCurrency": "Cash by currency", "dash.salesByCurrency": "Sales by currency", "dash.noShiftHint": "No open shift — open one from the POS to start working",
-  "app.name": "PharmaCore",
+  "print.period": "Period", "print.printedAt": "Printed at", "print.printedBy": "Printed by", "dash.updatedAt": "Updated", "common.refresh": "Refresh", "app.name": "PharmaCore",
   "common.save": "Save", "common.cancel": "Cancel", "common.close": "Close", "common.search": "Search", "common.loading": "Loading…", "common.actions": "Actions",
   "common.yes": "Yes", "common.no": "No", "common.confirm": "Confirm", "common.delete": "Delete", "common.edit": "Edit", "common.new": "New", "common.back": "Back", "common.next": "Next",
   "common.date": "Date", "common.from": "From", "common.to": "To", "common.total": "Total", "common.status": "Status", "common.notes": "Notes", "common.reason": "Reason",

@@ -94,9 +94,9 @@ function ReceiveModal({ customer, open, onClose }: { customer: Customer; open: b
               ))}</tbody>
             </table>
           )}
-          <div className="mt-2 text-sm text-slate-600">{t("cust.allocated")}: <span className="num">{allocTotal === null ? "?" : fmtMinor(allocTotal.toString(), currency, locale)}</span></div>
+          <div className="mt-2 text-sm text-ink-600">{t("cust.allocated")}: <span className="num">{allocTotal === null ? "?" : fmtMinor(allocTotal.toString(), currency, locale)}</span></div>
         </div>
-        {err && <div role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700 sm:col-span-3">{err}</div>}
+        {err && <div role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700 sm:col-span-3">{err}</div>}
         <div className="flex justify-end gap-2 sm:col-span-3">
           <button type="button" className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button>
           <button type="submit" className="btn-primary" disabled={m.isPending}>{t("common.confirm")}</button>
@@ -126,10 +126,10 @@ export default function CustomerDetail() {
         <button className="btn-primary" onClick={() => setPay(true)}>{t("cust.receive")}</button>
       </>} />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <div className="card"><div className="text-xs text-slate-500">{t("cust.balance")}</div><div className="num mt-1 text-2xl font-semibold">{fmtMoney(c.balance, locale)}</div></div>
-        <div className="card"><div className="text-xs text-slate-500">{t("cust.creditLimit")}</div><div className="num mt-1 text-2xl font-semibold">{c.credit_limit_minor ? fmtMinor(c.credit_limit_minor, c.credit_currency ?? cur, locale) : "—"}</div></div>
-        <div className="card"><div className="text-xs text-slate-500">{t("cust.phone")}</div><div className="num mt-1 text-lg">{c.phone ?? "—"}</div></div>
-        <div className="card"><div className="text-xs text-slate-500">{t("common.status")}</div><div className="mt-1">{c.is_active ? <Badge tone="green">{t("common.active")}</Badge> : <Badge tone="red">{t("common.inactive")}</Badge>} {c.is_walk_in && <Badge>{t("cust.walkIn")}</Badge>}</div></div>
+        <div className="card"><div className="text-xs text-ink-500">{t("cust.balance")}</div><div className="num mt-1 text-2xl font-semibold">{fmtMoney(c.balance, locale)}</div></div>
+        <div className="card"><div className="text-xs text-ink-500">{t("cust.creditLimit")}</div><div className="num mt-1 text-2xl font-semibold">{c.credit_limit_minor ? fmtMinor(c.credit_limit_minor, c.credit_currency ?? cur, locale) : "—"}</div></div>
+        <div className="card"><div className="text-xs text-ink-500">{t("cust.phone")}</div><div className="num mt-1 text-lg">{c.phone ?? "—"}</div></div>
+        <div className="card"><div className="text-xs text-ink-500">{t("common.status")}</div><div className="mt-1">{c.is_active ? <Badge tone="green">{t("common.active")}</Badge> : <Badge tone="red">{t("common.inactive")}</Badge>} {c.is_walk_in && <Badge>{t("cust.walkIn")}</Badge>}</div></div>
       </div>
       <div className="card mt-4">
         <div className="mb-3 flex flex-wrap items-end gap-3">

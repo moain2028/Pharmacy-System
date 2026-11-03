@@ -56,7 +56,7 @@ function SalesList() {
           <table>
             <thead><tr><th>{t("sales.number")}</th><th>{t("common.date")}</th><th>{t("pos.customer")}</th><th>{t("common.total")}</th><th>{t("sales.paid")}</th><th>{t("sales.credit")}</th><th>{t("common.status")}</th></tr></thead>
             <tbody>{rows.map((r) => (
-              <tr key={r.id} className="cursor-pointer hover:bg-slate-50" onClick={() => nav(`/sales/${r.id}`)}>
+              <tr key={r.id} className="cursor-pointer hover:bg-ink-50" onClick={() => nav(`/sales/${r.id}`)}>
                 <td className="num">{r.number}</td><td className="num">{r.business_date}</td><td>{r.customer_name ?? t("pos.walkIn")}</td>
                 <td className="num">{fmtMinor(r.total_minor, r.currency, locale)}</td><td className="num">{fmtMinor(r.paid_minor, r.currency, locale)}</td>
                 <td className="num">{fmtMinor(r.credit_minor, r.currency, locale)}</td><td><Badge tone={statusTone(r.status)}>{t(statusKey(r.status))}</Badge></td>
@@ -65,7 +65,7 @@ function SalesList() {
           </table>)}
         <div className="mt-3 flex items-center justify-between text-sm">
           <button className="btn-secondary" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - LIMIT))}>{t("sales.prev")}</button>
-          <span className="num text-slate-500">{offset + 1}–{offset + rows.length} / {total}</span>
+          <span className="num text-ink-500">{offset + 1}–{offset + rows.length} / {total}</span>
           <button className="btn-secondary" disabled={offset + rows.length >= total} onClick={() => setOffset(offset + LIMIT)}>{t("common.next")}</button>
         </div>
       </div>

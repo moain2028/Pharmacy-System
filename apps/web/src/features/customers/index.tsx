@@ -74,7 +74,7 @@ export function CustomerForm({ open, onClose, initial }: { open: boolean; onClos
           <select className="input" value={cur} onChange={(e) => setCur(e.target.value)} disabled={!canCredit}>{CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         </Field>
         <div className="sm:col-span-2"><Field label={t("common.notes")}><textarea className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></Field></div>
-        {err && <div role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700 sm:col-span-2">{err}</div>}
+        {err && <div role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700 sm:col-span-2">{err}</div>}
         <div className="flex justify-end gap-2 sm:col-span-2">
           <button type="button" className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button>
           <button type="submit" className="btn-primary" disabled={m.isPending}>{t("common.save")}</button>
@@ -107,7 +107,7 @@ function CustomerList() {
             <thead><tr><th>{t("cust.code")}</th><th>{t("cust.name")}</th><th>{t("cust.phone")}</th><th>{t("cust.creditLimit")}</th><th>{t("common.status")}</th><th>{t("common.actions")}</th></tr></thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="cursor-pointer hover:bg-slate-50" onClick={() => nav(`/customers/${r.id}`)}>
+                <tr key={r.id} className="cursor-pointer hover:bg-ink-50" onClick={() => nav(`/customers/${r.id}`)}>
                   <td className="num">{r.code}</td>
                   <td>{r.name} {r.is_walk_in && <Badge>{t("cust.walkIn")}</Badge>}</td>
                   <td className="num">{r.phone ?? "—"}</td>

@@ -53,8 +53,8 @@ export function CashbookReport() {
     </>
   );
   return (
-    <ReportView title={t("reports.tab.cashbook")} filename="cashbook" filters={filters} loading={q.isLoading} error={q.error ?? boxes.error} onRetry={() => { void boxes.refetch(); if (cashboxId) void q.refetch(); }} columns={cols} rows={rows} totals={totals}>
-      {cashboxId === "" && <p className="mt-2 text-sm text-slate-500">{t("reports.selectCashbox")}</p>}
+    <ReportView period={`${from} → ${to}`} title={t("reports.tab.cashbook")} filename="cashbook" filters={filters} loading={q.isLoading} error={q.error ?? boxes.error} onRetry={() => { void boxes.refetch(); if (cashboxId) void q.refetch(); }} columns={cols} rows={rows} totals={totals}>
+      {cashboxId === "" && <p className="mt-2 text-sm text-ink-500">{t("reports.selectCashbox")}</p>}
     </ReportView>
   );
 }
@@ -69,5 +69,5 @@ export function AuditReport() {
     details: str(pick(r, "details", "payload", "diff")).slice(0, 160),
   })), [q.data]);
   const cols: Column[] = ["occurredAt", "actor", "action", "entity", "details"].map((k) => ({ key: k, title: t(`reports.col.${k}`), num: k === "occurredAt" }));
-  return <ReportView title={t("reports.tab.audit")} filename="audit" filters={fields} loading={q.isLoading} error={q.error} onRetry={() => void q.refetch()} columns={cols} rows={rows} />;
+  return <ReportView period={`${from} → ${to}`} title={t("reports.tab.audit")} filename="audit" filters={fields} loading={q.isLoading} error={q.error} onRetry={() => void q.refetch()} columns={cols} rows={rows} />;
 }

@@ -37,7 +37,7 @@ export default function SaleDetail() {
   if (!d) return <Empty>{t("sales.notFound")}</Empty>;
   const inv = d.invoice;
   const cur = inv.currency;
-  const Info = ({ k, v }: { k: string; v: string }) => <div><div className="text-xs text-slate-500">{k}</div><div className="num font-medium">{v}</div></div>;
+  const Info = ({ k, v }: { k: string; v: string }) => <div><div className="text-xs text-ink-500">{k}</div><div className="num font-medium">{v}</div></div>;
   return (
     <>
       <div className="print:hidden">
@@ -50,7 +50,7 @@ export default function SaleDetail() {
           <Info k={t("common.date")} v={inv.business_date} />
           <Info k={t("pos.customer")} v={inv.customer_name ?? t("pos.walkIn")} />
           <Info k={t("sales.cashier")} v={inv.cashier_name ?? "—"} />
-          <div><div className="text-xs text-slate-500">{t("common.status")}</div><Badge tone={statusTone(inv.status)}>{t(statusKey(inv.status))}</Badge></div>
+          <div><div className="text-xs text-ink-500">{t("common.status")}</div><Badge tone={statusTone(inv.status)}>{t(statusKey(inv.status))}</Badge></div>
           <Info k={t("common.total")} v={fmtMinor(inv.total_minor, cur, locale)} />
           <Info k={t("sales.paid")} v={fmtMinor(inv.paid_minor, cur, locale)} />
           <Info k={t("sales.credit")} v={fmtMinor(inv.credit_minor, cur, locale)} />
@@ -60,8 +60,8 @@ export default function SaleDetail() {
             <tbody>{d.lines.map((l) => (
               <tr key={l.id}>
                 <td>{lineName(l, locale)}
-                  <div className="mt-1 flex flex-wrap gap-1 text-xs text-slate-500">{(lotsByLine.get(l.id) ?? []).map((lot) => (
-                    <span key={lot.lot_id} className="num rounded bg-slate-100 px-1">{t("pos.lot")} {lot.lot_number} · {lot.expiry_date ?? "—"} · {lot.qty_ssu}</span>))}</div></td>
+                  <div className="mt-1 flex flex-wrap gap-1 text-xs text-ink-500">{(lotsByLine.get(l.id) ?? []).map((lot) => (
+                    <span key={lot.lot_id} className="num rounded bg-ink-100 px-1">{t("pos.lot")} {lot.lot_number} · {lot.expiry_date ?? "—"} · {lot.qty_ssu}</span>))}</div></td>
                 <td className="num">{l.qty_in_unit} {unitName(l, locale)}</td>
                 <td className="num">{fmtMinor(l.unit_price_minor, cur, locale)}</td>
                 <td className="num">{fmtMinor(l.discount_minor ?? "0", cur, locale)}</td>

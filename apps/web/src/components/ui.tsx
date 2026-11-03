@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useId, useRef } from "react";
 import { ApiError } from "@/lib/api";
 import { useT } from "@/i18n";
 
@@ -30,12 +30,13 @@ export function Empty({ children }: { children?: ReactNode }) {
 }
 
 export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string | undefined; error?: string | undefined }) {
+  const id = useId();
   return (
-    <label className="block">
+    <label className="block" aria-describedby={hint || error ? `${id}-d` : undefined} aria-invalid={error ? true : undefined}>
       <span className="label">{label}</span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-ink-500">{hint}</span>}
-      {error && <span className="mt-1 block text-xs font-medium text-rose-600">{error}</span>}
+      {hint && !error && <span id={`${id}-d`} className="mt-1 block text-xs text-ink-500">{hint}</span>}
+      {error && <span id={`${id}-d`} role="alert" className="mt-1 block text-xs font-medium text-rose-600">{error}</span>}
     </label>
   );
 }
@@ -47,11 +48,29 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [open, onClose]);
-  useEffect(() => { if (!open) return; const prev = document.body.style.overflow; document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = prev; }; }, [open]);
+  const panel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const prev = document.body.style.overflow; document.body.style.overflow = "hidden";
+    // Initial focus: first autofocus/focusable control inside, else the panel itself.
+    const t = setTimeout(() => { const el = panel.current?.querySelector<HTMLElement>("[autofocus], input:not([type=hidden]), select, textarea, button:not([aria-label=close])") ?? panel.current; el?.focus(); }, 0);
+    // Focus trap (Tab / Shift+Tab cycle inside the dialog).
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !panel.current) return;
+      const f = [...panel.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter((x) => x.offsetParent !== null);
+      if (f.length === 0) return;
+      const first = f[0]!, last = f[f.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    window.addEventListener("keydown", trap);
+    return () => { clearTimeout(t); window.removeEventListener("keydown", trap); document.body.style.overflow = prev; opener?.focus?.(); };
+  }, [open]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/45 backdrop-blur-[2px] sm:items-center sm:p-4" onMouseDown={onClose}>
-      <div role="dialog" aria-modal="true" aria-label={title}
+      <div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
         className={`flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-white shadow-pop animate-fade-up sm:rounded-2xl ${wide ? "sm:max-w-4xl" : "sm:max-w-lg"}`} onMouseDown={(e) => e.stopPropagation()}>
         <div className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-ink-200 sm:hidden" aria-hidden="true" />
         <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-3 sm:px-5 sm:pt-4"><h2 className="text-lg">{title}</h2><button aria-label="close" className="btn-icon btn-ghost -me-2 h-9 w-9" onClick={onClose}>✕</button></div>
@@ -81,7 +100,7 @@ import { create } from "zustand";
 interface Toast { id: number; kind: "ok" | "err" | "info"; text: string }
 export const useToasts = create<{ list: Toast[]; push: (kind: Toast["kind"], text: string) => void; drop: (id: number) => void }>((set) => ({
   list: [],
-  push: (kind, text) => { const id = Date.now() + Math.random(); set((s) => ({ list: [...s.list, { id, kind, text }] })); setTimeout(() => set((s) => ({ list: s.list.filter((t) => t.id !== id) })), 4000); },
+  push: (kind, text) => { const id = Date.now() + Math.random(); set((s) => ({ list: [...s.list, { id, kind, text }] })); if (kind !== "err") setTimeout(() => set((s) => ({ list: s.list.filter((t) => t.id !== id) })), 4000); },
   drop: (id) => set((s) => ({ list: s.list.filter((t) => t.id !== id) })),
 }));
 export const toast = { ok: (t: string) => useToasts.getState().push("ok", t), err: (t: string) => useToasts.getState().push("err", t), info: (t: string) => useToasts.getState().push("info", t) };
@@ -90,8 +109,9 @@ export function Toaster() {
   return (
     <div className="toaster pointer-events-none fixed inset-x-3 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:start-4 sm:items-start" style={{ bottom: "calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + .75rem)" }} aria-live="polite">
       {list.map((t) => (
-        <div key={t.id} role="status" onClick={() => drop(t.id)} className={`pointer-events-auto flex w-full max-w-sm cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-pop animate-fade-up ${t.kind === "ok" ? "bg-emerald-600" : t.kind === "err" ? "bg-rose-600" : "bg-ink-800"}`}>
+        <div key={t.id} role={t.kind === "err" ? "alert" : "status"} className={`pointer-events-auto flex w-full max-w-sm items-center gap-2 rounded-xl ps-4 pe-2 py-2.5 text-sm font-medium text-white shadow-pop animate-fade-up ${t.kind === "ok" ? "bg-emerald-700" : t.kind === "err" ? "bg-rose-700" : "bg-ink-800"}`}>
           <span aria-hidden="true">{t.kind === "ok" ? "✓" : t.kind === "err" ? "!" : "i"}</span><span className="flex-1">{t.text}</span>
+          <button type="button" aria-label="close" onClick={() => drop(t.id)} className="grid h-8 w-8 place-items-center rounded-md text-white/80 hover:bg-white/15 hover:text-white">✕</button>
         </div>
       ))}
     </div>

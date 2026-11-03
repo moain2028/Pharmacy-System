@@ -57,7 +57,7 @@ export function OpeningTab() {
   const abs = calc.diff < 0n ? -calc.diff : calc.diff;
   return (
     <form className="card grid gap-3" onSubmit={submit} noValidate>
-      {err && <p role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700">{err}</p>}
+      {err && <p role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700">{err}</p>}
       <div className="max-w-xs"><Field label={t("acc.businessDate")}><input type="date" className="input num" value={date} onChange={(e) => setDate(e.target.value)} /></Field></div>
       <datalist id="acc-codes">{(tb.data?.rows ?? []).map((r) => <option key={r.code} value={r.code}>{locale === "ar" ? r.name_ar : r.name_en}</option>)}</datalist>
       <table>
@@ -76,13 +76,13 @@ export function OpeningTab() {
                 <option value="">{t("acc.none")}</option>
                 {rowsOf(boxes.data).map((b) => <option key={b.id} value={b.id}>{locale === "ar" ? b.name_ar : b.name_en}</option>)}
               </select></td>
-              <td><button type="button" aria-label={t("acc.removeLine")} className="text-slate-400 hover:text-red-600" disabled={lines.length <= 1} onClick={() => setLines((ls) => ls.filter((x) => x.k !== l.k))}>✕</button></td>
+              <td><button type="button" aria-label={t("acc.removeLine")} className="text-ink-400 hover:text-danger-700" disabled={lines.length <= 1} onClick={() => setLines((ls) => ls.filter((x) => x.k !== l.k))}>✕</button></td>
             </tr>
           ))}
         </tbody>
       </table>
       <div><button type="button" className="btn-secondary" onClick={() => setLines((ls) => [...ls, blank()])}>{t("acc.addLine")}</button></div>
-      <div className="grid gap-1 rounded-md bg-slate-50 p-3 text-sm" aria-live="polite">
+      <div className="grid gap-1 rounded-md bg-ink-50 p-3 text-sm" aria-live="polite">
         <div>{t("acc.totalDebit")}: <span className="num">{fmtMinor(calc.d, base, locale)}</span></div>
         <div>{t("acc.totalCredit")}: <span className="num">{fmtMinor(calc.c, base, locale)}</span></div>
         <div className="font-semibold">{calc.diff === 0n ? t("acc.balanced") : <>{t("acc.balancing")}: <span className="num">{fmtMinor(abs, base, locale)}</span> ({calc.diff > 0n ? t("acc.credit") : t("acc.debit")})</>}</div>

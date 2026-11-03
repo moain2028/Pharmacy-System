@@ -45,12 +45,12 @@ export function OverridesEditor({ user, onClose }: { user: UserRow; onClose: () 
   return (
     <Modal open wide onClose={onClose} title={t("users.overridesTitle", { name: user.display_name })}
       footer={<><button className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button><button className="btn-primary" disabled={m.isPending} onClick={save}>{t("common.save")}</button></>}>
-      <p className="mb-2 text-xs text-slate-500">{t("users.overridesNote")}</p>
-      {err && <p role="alert" className="mb-2 rounded-md bg-red-50 p-2 text-sm text-red-700">{err}</p>}
+      <p className="mb-2 text-xs text-ink-500">{t("users.overridesNote")}</p>
+      {err && <p role="alert" className="mb-2 rounded-md bg-danger-50 p-2 text-sm text-danger-700">{err}</p>}
       <Field label={t("users.filterPerms")}><input className="input" dir="ltr" autoFocus value={filter} onChange={(e) => setFilter(e.target.value)} /></Field>
       {perms.isLoading ? <Spinner /> : perms.error ? <ErrorBox error={perms.error} /> : groups.map(([g, list]) => (
-        <details key={g} className="mt-2 rounded-md border border-slate-200 p-2" open={!!filter}>
-          <summary className="cursor-pointer font-medium" dir="ltr">{g} <span className="num text-xs text-slate-500">({list.filter((p) => map[p]).length}/{list.length})</span></summary>
+        <details key={g} className="mt-2 rounded-md border border-ink-200 p-2" open={!!filter}>
+          <summary className="cursor-pointer font-medium" dir="ltr">{g} <span className="num text-xs text-ink-500">({list.filter((p) => map[p]).length}/{list.length})</span></summary>
           <table className="mt-2"><tbody>
             {list.map((p) => {
               const o = map[p];
