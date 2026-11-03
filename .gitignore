@@ -9,3 +9,13 @@ media/video/*.mp3
 media/video/frames/
 media/video/audio/
 __pycache__/
+media/video/audio2/
+media/video/anim/
+media/video/clips/
+media/video/clipframes/
+media/video/clipframes_blur/
+media/video/seg_*.mp4
+media/video/joined.mp4
+media/video/concat.txt
+media/video/explainer_preview.mp4
+media/video/build.log
