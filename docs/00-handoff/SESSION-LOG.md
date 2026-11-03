@@ -74,3 +74,16 @@
 - CI workflow نُقل إلى `ci/github/` لأن GitHub يرفض دفع workflows من توكن التطبيق.
 **PR:** https://github.com/moain2028/Pharmacy-System/pull/3
 **التالي:** انظر PROJECT-STATE §2.
+
+---
+
+## Session #5 — 2026-11-03 — Sales/Shifts API + استكمال domain (PR #5)
+**الطلب:** "اشتي النظام متكامل، تجهزه بالكامل. انطلق، مع المعايير ذيك، لا تتوقفش."
+**ما تم:**
+- `apps/api/src/sales`: POS posting كامل (quote/post، FEFO مع حجز داخل الفاتورة، تسعير قائمة العميل→التجزئة، السعر الرسمي، رفع صلاحية المدير بالـ PIN، idempotency، باقي عابر للعملات مع قيد غسل FX)، ورديات (فتح برصيد افتتاحي مرحّل، X-report، إغلاق مع سماحية فرق وموافقة مشرف، حركات نقد يدوية، أرصدة الصناديق). **47 اختبار E2E خضراء.**
+- إصلاح جوهري: حركة الباقي كانت تُكتب `SALE` بقيمة سالبة فتُفشل إعادة بناء الوردية (`cash.sign_mismatch`) → الدرج يستلم **الصافي** (tendered − change) كحركة `SALE` واحدة؛ الباقي عابر العملة يُكتب `ADJUSTMENT` سالب بسبب `change`.
+- إغلاق الوردية: فرق فوق السماحية يتطلب موافقاً (approver {username, secret} عبر `AuthService.elevate` بصلاحية `shifts.close_others`، أو الفاعل نفسه إن كان يملكها).
+- دمج مخرجات الوكلاء C1–C3: `supplier-invoice.ts`, `purchase-return.ts`, `supplier-ledger.ts`, `posting-rules-treasury.ts` (+ اختباراتها). أُضيف للدليل 5150 (فروق أسعار الشراء) و5250 (خسائر مرتجعات الشراء). حُلّت تصادمات الأسماء (`InvoiceEarlyPaymentTerms`, `addDaysIso`, `FxExchangePostingInput`). **domain: 919 اختبار، 99.67%.**
+- اختبار PRO_RATA للوكيل كان يتوقع 30k/20k لتوزيع 50k على 80k/60k — الصحيح 28,571.43/21,428.57 (Half-Up) وصُحّح الاختبار لا الكود.
+**PR:** #5 (genspark_ai_developer → main).
+**التالي:** PROJECT-STATE §2 (Returns/Customers → Purchasing → Treasury/Reports → web → desktop).
