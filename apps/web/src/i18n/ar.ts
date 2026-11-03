@@ -9,7 +9,7 @@ export const ar: Record<string, string> = {
   "nav.dashboard": "الرئيسية", "nav.pos": "نقطة البيع", "nav.sales": "المبيعات", "nav.returns": "المرتجعات", "nav.customers": "العملاء", "nav.items": "الأصناف", "nav.inventory": "المخزون",
   "nav.expiry": "الصلاحيات", "nav.purchasing": "المشتريات", "nav.suppliers": "الموردون", "nav.payables": "ذمم الموردين", "nav.cash": "الصندوق والورديات", "nav.expenses": "المصروفات",
   "nav.reports": "التقارير", "nav.accounting": "المحاسبة", "nav.settings": "الإعدادات", "nav.users": "المستخدمون", "nav.logout": "تسجيل الخروج", "nav.language": "English",
-  "auth.title": "تسجيل الدخول", "auth.username": "اسم المستخدم", "auth.password": "كلمة المرور", "auth.signIn": "دخول", "auth.pin": "رمز PIN", "auth.approver": "المعتمِد", "auth.approverSecret": "PIN أو كلمة المرور",
+  "auth.demoTitle": "دخول سريع (نسخة تجريبية)", "auth.demoOwner": "المالك", "auth.demoCashier": "كاشير", "auth.title": "تسجيل الدخول", "auth.username": "اسم المستخدم", "auth.password": "كلمة المرور", "auth.signIn": "دخول", "auth.pin": "رمز PIN", "auth.approver": "المعتمِد", "auth.approverSecret": "PIN أو كلمة المرور",
   "setup.title": "إعداد الصيدلية", "setup.pharmacy": "الصيدلية", "setup.owner": "حساب المالك", "setup.currency": "العملة الأساسية", "setup.done": "اكتمل الإعداد",
   "shift.open": "فتح وردية", "shift.close": "إغلاق الوردية", "shift.openingFloat": "رصيد افتتاحي", "shift.counted": "النقد المعدود", "shift.expected": "المتوقع", "shift.variance": "الفرق", "shift.xReport": "تقرير X", "shift.none": "لا توجد وردية مفتوحة",
   "pos.scanOrSearch": "امسح الباركود أو ابحث عن صنف (F2)", "pos.cart": "السلة", "pos.subtotal": "المجموع", "pos.tax": "الضريبة", "pos.total": "الإجمالي", "pos.tendered": "المدفوع", "pos.change": "الباقي",

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { Sql } from "@pharmacore/db";
 import { CURRENCY_CODES, DEFAULT_CHART, type CurrencyCode } from "@pharmacore/domain";
+import { CONFIG, type AppConfig } from "../infra/config.js";
 import { Db } from "../infra/db.js";
 import { ApiError } from "../shared/errors.js";
 import { hashPassword } from "./password.js";
@@ -22,11 +23,11 @@ const EXTRA_ACCOUNTS: ReadonlyArray<{ code: string; ar: string; en: string; type
 
 @Injectable()
 export class SetupService {
-  constructor(@Inject(Db) private readonly db: Db) {}
+  constructor(@Inject(Db) private readonly db: Db, @Inject(CONFIG) private readonly cfg: AppConfig) {}
 
-  async status(): Promise<{ initialized: boolean; tenants: Array<{ id: string; nameAr: string; nameEn: string }> }> {
+  async status(): Promise<{ initialized: boolean; demo: boolean; tenants: Array<{ id: string; nameAr: string; nameEn: string }> }> {
     const rows = await this.db.admin()<{ id: string; name_ar: string; name_en: string }[]>`SELECT id, name_ar, name_en FROM tenants ORDER BY created_at`;
-    return { initialized: rows.length > 0, tenants: rows.map((r) => ({ id: r.id, nameAr: r.name_ar, nameEn: r.name_en })) };
+    return { initialized: rows.length > 0, demo: this.cfg.DEMO_MODE, tenants: rows.map((r) => ({ id: r.id, nameAr: r.name_ar, nameEn: r.name_en })) };
   }
 
   /**

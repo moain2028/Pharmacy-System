@@ -40,6 +40,7 @@ ENABLE_DOCS=true
 STATIC_DIR=$InstallDir\web
 BACKUP_DIR=$Backups
 BACKUP_KEEP=30
+# DEMO_MODE=true  # trial boxes only: seeds users 1/1 (owner) and 2/2 (cashier) + quick-login buttons. Never for a real pharmacy.
 "@ | Set-Content -Path $EnvFile -Encoding utf8
   $acl = Get-Acl $EnvFile; $acl.SetAccessRuleProtection($true, $false)
   foreach ($id in @("BUILTIN\Administrators", "NT AUTHORITY\SYSTEM")) { $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($id, "FullControl", "Allow"))) }

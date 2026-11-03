@@ -42,9 +42,11 @@ export class BackupService {
 
   async create(note?: string | undefined): Promise<BackupMeta> {
     await mkdir(this.dir, { recursive: true });
-    const ts = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 15).replace(/(\d{8})(\d{6}).*/, "$1-$2");
-    const fileName = `pharmacore-${ts}.dump`;
-    const path = join(this.dir, fileName);
+    // Name = second-resolution timestamp (contract shared with desktop scripts). If two backups land in the
+    // same second, advance to the next free second instead of overwriting the previous file.
+    const stamp = (d: Date) => d.toISOString().replace(/[-:T]/g, "").slice(0, 15).replace(/(\d{8})(\d{6}).*/, "$1-$2");
+    let at = Date.now(); let fileName = `pharmacore-${stamp(new Date(at))}.dump`; let path = join(this.dir, fileName);
+    while (await stat(path).then(() => true, () => false)) { at += 1000; fileName = `pharmacore-${stamp(new Date(at))}.dump`; path = join(this.dir, fileName); }
     await this.run("pg_dump", ["--format=custom", "--no-owner", "--no-privileges", "--file", path], this.pgEnv());
     const [s, sha] = await Promise.all([stat(path), this.sha256(path)]);
     const meta: BackupMeta = { fileName, sizeBytes: s.size, createdAt: new Date().toISOString(), sha256: sha, note: note ?? null };
