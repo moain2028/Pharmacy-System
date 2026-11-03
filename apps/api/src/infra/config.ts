@@ -11,6 +11,8 @@ const schema = z.object({
   REFRESH_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(14 * 24 * 3600),
   /** Directory for pg_dump backups (desktop installer points this at %ProgramData%\PharmaCore\backups). */
   BACKUP_DIR: z.string().default("./backups"),
+  /** When set, the API serves the built web app (apps/web/dist) at / with SPA fallback — single-process desktop mode. */
+  STATIC_DIR: z.string().optional(),
   /** Expose Swagger UI in production too (desktop build sets true; LAN-only). */
   ENABLE_DOCS: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
   BACKUP_KEEP: z.coerce.number().int().min(1).default(30),
