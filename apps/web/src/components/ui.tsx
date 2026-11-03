@@ -24,7 +24,7 @@ export function Empty({ children }: { children?: ReactNode }) {
   return <div className="p-8 text-center text-sm text-slate-500">{children ?? t("common.noData")}</div>;
 }
 
-export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string; error?: string }) {
+export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string | undefined; error?: string | undefined }) {
   return (
     <label className="block">
       <span className="label">{label}</span>
