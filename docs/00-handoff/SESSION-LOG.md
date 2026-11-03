@@ -156,3 +156,11 @@ Owner flagged: KPI number colliding with icon + currency wrapping; print preview
 - **Ergonomics/a11y**: 16 px root; 48 px coarse targets; `viewport-fit=cover`; checkbox sizing; `<html lang dir>` sync; Modal focus trap/restore; persistent error toasts + dismiss; `aria-describedby`; RTL select padding; numeric alignment; `.table-stack`.
 - **IA**: language moved to Settings (already had a radio group); UserBox now links Settings; calmer active-nav indicator (M3 rail style).
 - Migrated 32 feature files from `slate/red` to tokens. Web 44/44, eslint 0, audit **51/51 clean**, print PDF verified.
+
+## Session #13 — 2026-11-03 (hierarchy, shortcuts, dark theme, prefs)
+- **Navigation IA** (`apps/web/src/app/nav.ts`): sections → items → URL-bound sub-items (`?tab=`). Sidebar: **section headers are collapsible disclosure buttons with rotating chevrons** (owner's request), active section cannot collapse, state persisted per device; items with children get an item-level chevron showing sub-items; `aria-expanded/controls` throughout.
+- **Breadcrumbs** in the top bar (section › item › sub-item/detail). `useTab` hook makes inventory/accounting/users/purchasing tabs deep-linkable.
+- **Keyboard**: `g`+chord navigation (d/s/r/c/i/k/e/o/u/h/p/,), `F2` POS, `Alt+M` menu, `?` shortcut sheet — all on `e.code` (Arabic layout safe), ignored while typing (WCAG 2.1.4). Verified by Playwright probe.
+- **Dark theme**: `ink` ramp + surfaces routed through CSS variables; `[data-theme=dark]` inverts the ramp (#E6ECED on #0E1517 = 15.5:1); semantic surfaces remapped. **Preferences** (Settings): language, appearance (system/light/dark), digits (0-9 / ٠-٩, receipts stay Latin), density. Stored per device (`pharmacore.prefs`), applied at boot + on OS change.
+- **Audit tooling**: `tools/ui-audit/crawl.mjs` now also flags text < 3:1 contrast and runs in dark with `THEME=dark`; `contrast.mjs` pinpoints offending nodes. Results: **light 51/51 clean, dark 51/51 clean** after fixing ink-400 text, dark hover rows, dark rose buttons.
+- Gates: tsc 0, eslint 0, web 44/44, API 98/98 (unchanged).

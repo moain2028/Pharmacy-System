@@ -40,7 +40,7 @@
   [data-theme="dark"] .hover\:bg-brand-50:hover { background-color: rgb(17 94 89 / 0.25); }
   [data-theme="dark"] .text-brand-800 { color: #80C9C3; }
   [data-theme="dark"] .bg-amber-50 { background-color: rgb(146 64 14 / 0.2); } [data-theme="dark"] .text-amber-900, [data-theme="dark"] .text-amber-800 { color: #FDE68A; } [data-theme="dark"] .border-amber-200 { border-color: rgb(217 119 6 / 0.4); }
-  [data-theme="dark"] .bg-danger-50 { background-color: rgb(190 18 60 / 0.2); } [data-theme="dark"] .text-danger-700 { color: #FDA4AF; }
+  [data-theme="dark"] .bg-danger-50 { background-color: rgb(190 18 60 / 0.2); } [data-theme="dark"] .text-danger-700, [data-theme="dark"] .text-rose-700, [data-theme="dark"] .text-danger-600 { color: #FDA4AF; }
   [data-theme="dark"] .bg-emerald-50, [data-theme="dark"] .bg-success-50 { background-color: rgb(4 120 87 / 0.2); } [data-theme="dark"] .text-emerald-800 { color: #6EE7B7; }
   [data-theme="dark"] .shadow-card, [data-theme="dark"] .shadow-pop { box-shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -8px rgb(0 0 0 / .5); }
   [data-theme="dark"] .skeleton { background-image: linear-gradient(90deg, rgb(var(--ink-100)) 25%, rgb(var(--ink-200)) 37%, rgb(var(--ink-100)) 63%); }

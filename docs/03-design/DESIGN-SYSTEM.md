@@ -39,3 +39,8 @@ Every report is wrapped in `PrintFrame`: pharmacy name, document title, period, 
 
 ## Verification
 `tools/ui-audit/crawl.mjs` logs in, visits every route at phone/tablet/desktop, and fails on: JS/console errors, HTTP ≥ 500, horizontal overflow, placeholder text, empty pages, tap targets < 32 px. Run it after any shell/style change.
+
+## Navigation & preferences (session #13)
+- IA lives in `app/nav.ts` (2 levels max). Section headers collapse with chevrons; items with sub-items expose them under the item; sub-items are `?tab=` links. Breadcrumbs derive from the same model.
+- Shortcuts: `g` + chord per item, `F2` POS, `Alt+M` menu, `?` sheet; matched on `e.code`.
+- Dark theme = CSS-variable swap under `[data-theme="dark"]`; never add per-component dark classes — add a remap line in the dark block instead. Preferences are per device (`lib/prefs.ts`).
