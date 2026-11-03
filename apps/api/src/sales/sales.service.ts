@@ -134,7 +134,7 @@ export class SalesService {
         .map((r) => { const lot = hydrateLot(r); lotMap.set(lot.lotId, lot); return { lot, availableSsu: BigInt(r.qty_ssu) - (reserved.get(lot.lotId) ?? 0n), receivedAt: r.received_at.toISOString() }; })
         .filter((b) => b.availableSsu > 0n);
       const fefo = allocateFefo(
-        { itemId: l.itemId, qtySsu, businessDate, lots: balances, overrideLotId: l.lotOverride?.lotId, override: l.lotOverride ? { permission: "inventory.lot_override_fefo", approvedBy: approverId ?? "unverified", reason: l.lotOverride.reason } : undefined },
+        { itemId: l.itemId, qtySsu, businessDate, lots: balances, overrideLotId: l.lotOverride?.lotId, override: l.lotOverride ? { permission: "lots.override_fefo", approvedBy: approverId ?? "unverified", reason: l.lotOverride.reason } : undefined },
         { allowNegativeStock: false, nearExpiryDays },
       );
       if (isErr(fefo)) throw fefo.error;
@@ -189,7 +189,7 @@ export class SalesService {
         total: b.totals.total, tenders,
         change: { currency: changeCurrency, cashStepMinor: BigInt(tenant.cash_round_step_minor) > 0n ? BigInt(tenant.cash_round_step_minor) : 1n, rate: changeCurrency === currency ? undefined : await this.rate(tx, currency, changeCurrency) },
         credit: { allowCredit: !b.customer.is_walk_in && creditLimit.isPositive(), outstanding, creditLimit },
-        creditOverride: req.overrides?.credit && approverId ? { permission: "customers.credit_override", approvedBy: approverId, reason: req.overrides.reason } : undefined,
+        creditOverride: req.overrides?.credit && approverId ? { permission: "sales.credit", approvedBy: approverId, reason: req.overrides.reason } : undefined,
       });
       if (isErr(settlement)) throw settlement.error;
       const st = settlement.value;

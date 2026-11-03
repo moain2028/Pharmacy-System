@@ -199,3 +199,19 @@ I (integrator) register the module. Export classes only.
 """, 24000))
 Path(R / ".tmp_agents/jobs_api1.json").write_text(json.dumps(jobs, ensure_ascii=False), encoding="utf-8")
 for j in jobs: print(j["id"], j["model"], len(j["user"]) // 4, "tokens≈")
+
+# ---------------- D3 relaunch (corrected fixture + contracts) — only when invoked with "d3"
+if len(sys.argv) > 1 and sys.argv[1] == "d3":
+    d3 = [j for j in jobs if j["id"].startswith("D3")][0]
+    d3["id"] = "D3b-supplier-invoice-return-pay"; d3["out"] = ".tmp_agents/D3b-supplier-invoice-return-pay.json"
+    d3["user"] = d3["user"].replace("# Task D3 —", """# Task D3 (revised) —
+## ANSWERS TO YOUR QUESTIONS (contracts are now exact — implement, do not ask again)
+1. FIXTURE (corrected, base currency YER_NEW, 2 decimals → minor = ×100): lot = 10 boxes × 1,200.00 = 1,200,000 minor base cost, 240 SSU (box factor 24) → unit cost 5,000 minor/SSU. Supplier invoice at 1,200.00/box → Dr 2150 1,200,000 / Cr 2100 1,200,000. At 1,250.00/box → Dr 2150 1,200,000, Dr 5150 50,000 / Cr 2100 1,250,000. Purchase return of 2 boxes (48 SSU) at cost → Dr 2100 240,000 / Cr 1400 240,000, stock −48 SSU. Supplier payment FIFO 1,000,000 against the 1,250,000 invoice → remaining 250,000.
+2. Permission string is `supplier_invoices.match_override` (MATCH_OVERRIDE_PERMISSION in the domain file now equals this). Elevation: `const { approverId } = await this.auth.elevate(tenantId, { username, secret }, MATCH_OVERRIDE_PERMISSION)`; AuthService import: `import { AuthService } from "../identity/auth.service.js"`; `loadAccess(tx, userId)` returns `{ permissions: ReadonlySet<string> }`. Owner has every permission.
+3. `FundsAccount = { kind: "CASH"|"BANK"|"WALLET"; id: string }`; `DiscountValue = { mode: "PERCENT"; bp: number } | { mode: "AMOUNT"; amount: Money }`. Barrel `@pharmacore/domain` exports everything from supplier-invoice.ts, purchase-return.ts, supplier-ledger.ts, posting-rules-treasury.ts, posting-common.ts, inventory/lot.ts, money. `stock_balances` view: (tenant_id, item_id, lot_id, location_id, qty_ssu) = Σ stock_movements.qty_delta_ssu. `item_units`: id, item_id, name_ar, name_en, factor_to_ssu bigint, level, is_ssu, can_sell, can_purchase.
+4. Tolerances: tenants.settings.match_tolerance_qty_bp / match_tolerance_price_bp (default 0 and 200). Uniqueness (supplier_id, supplier_invoice_no): there is NO DB constraint — check with SELECT inside the tx and throw 409 `supplier_invoices.duplicate_number`.
+5. Ledger exports are `allocatePayment`, `aging` (not ageOpenItems), `balance`, `dueDateFor`, `addDays`. Use `aging`.
+6. Test data: create lot via POST /inventory/receipts (returns {lotId}); then with `const sql = connect(DATABASE_URL, 1)` (owner connection, bypasses RLS) INSERT suppliers (tenant_id, code, name), goods_receipts (tenant_id, number, status 'POSTED', supplier_id, location_id, currency 'YER_NEW', business_date, posted_at now(), created_by owner id from users) and goods_receipt_lines referencing that lot — fill NOT NULL columns per the DDL given; use `c.tenantId` for tenant_id. Open a shift (POST /shifts/open on REG1) before paying from REG1.
+""")
+    Path(R / ".tmp_agents/jobs_api_d3b.json").write_text(json.dumps([d3], ensure_ascii=False), encoding="utf-8")
+    print("D3b written", len(d3["user"]) // 4)
