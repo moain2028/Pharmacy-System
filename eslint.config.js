@@ -9,5 +9,9 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/explicit-module-boundary-types": "off"
     }
+  },
+  {
+    files: ["**/*.test.ts", "**/test/**/*.ts"],
+    rules: { "@typescript-eslint/no-non-null-assertion": "off" }
   }
 );

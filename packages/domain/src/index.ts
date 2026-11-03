@@ -2,3 +2,5 @@ export * from "./shared/result.js";
 export * from "./money/currency.js";
 export * from "./money/money.js";
 export * from "./quantity/quantity.js";
+export * from "./fx/exchange-rate.js";
+export * from "./pricing/discount.js";
