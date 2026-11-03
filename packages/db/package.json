@@ -1,0 +1,28 @@
+{
+  "name": "@pharmacore/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PharmaCore database: SQL migrations (source of truth), migration runner, DB-level invariant tests",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist", "migrations"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src test",
+    "db:migrate": "tsx src/cli.ts migrate",
+    "db:reset": "tsx src/cli.ts reset",
+    "test": "vitest run",
+    "test:coverage": "vitest run"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
