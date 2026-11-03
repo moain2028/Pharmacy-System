@@ -19,3 +19,5 @@ media/video/joined.mp4
 media/video/concat.txt
 media/video/explainer_preview.mp4
 media/video/build.log
+.tmp_agents/
+media/video/share/

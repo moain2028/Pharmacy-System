@@ -19,7 +19,15 @@
 ## 2. المهمة التالية بالضبط (Next Action)
 > **ابدأ من هنا إذا كنت وكيلاً جديداً.**
 
-**المرحلة 1 (التوثيق) مكتملة.** المهام التالية بالترتيب:
+**المرحلة 1 (التوثيق) مكتملة + المتطلبات التفصيلية "حرف حرف" مكتملة (Session #3).** قرارات المالك D-023..D-031 معتمدة (Stack، Windows أولاً، ثنائي اللغة، وحدات مرنة، 4 عملات، خصومات بضوابط، سعر رسمي، صلاحيات دقيقة، فريق الوكلاء).
+**المهمة التالية بالضبط = بدء الكود (المرحلة 2 — الأساس)** بفريق الوكلاء وفق D-031، بالترتيب:
+1. Monorepo (pnpm + Turborepo) + CI (typecheck/lint/test) + `tools/agents` جاهز.
+2. `packages/domain`: `Money` (BIGINT minor + currency، Half-Up، allocate)، `Quantity` (SSU BIGINT)، `UnitConversion` (factor_to_ssu + snapshot)، `Result`، UUIDv7 — تغطية 100%.
+3. `packages/db`: Drizzle schema بالقاموس الموحّد (`07-CROSS-REVIEW §4`) + هجرات SQL + Triggers (append-only، protect_posted، balanced_entry) + اختبارات تثبت الرفض.
+4. `apps/api` (NestJS/Fastify، Hexagonal): Identity (Argon2id/JWT/permissions `resource.action`) → Catalog+Units → Inventory/Lots/FEFO → Sales+Shifts → Purchasing → Cash/Expenses → Reports.
+5. `apps/web` React RTL/LTR i18n + شاشة POS لوحة-مفاتيح-أولاً.
+6. `apps/desktop` Tauri 2 + تغليف PostgreSQL كخدمة Windows + مثبّت (يحتاج جهاز Windows للاختبار النهائي — عند الفريق).
+المهام البشرية المتبقية (لا تعطّل الكود):
 1. **الفريق يشاهد `media/video/explainer.mp4` (v2 — Motion Graphics، بدون أسماء) ويراجع التوثيق** → يسجّل ملاحظاته كـ Issues أو تعديلات على الملفات.
    - قرار جديد يحتاج تأكيد الفريق: **D-022** (وضع تجاري في الواجهة + محرك قيد مزدوج داخلي + علم `accounting_full`).
 2. **اعتماد ADR-002 (Tech Stack)** — تصويت معين/مازن/عبدالكريم → تغيير الحالة من Proposed إلى Accepted في `adr/README.md` و`DECISIONS-LOG` (P-001, P-002).
@@ -32,7 +40,7 @@
 | # | المرحلة | الحالة | المخرجات الرئيسية |
 |---|---|---|---|
 | 0 | تأكيد المتطلبات مع العميل | ⏳ لم تبدأ (بانتظار جلسة مع صاحب الصيدلية) | استبيان مُجاب + SRS موقّع |
-| 1 | البحث والتحليل والتصميم | ✅ مكتملة (بانتظار الاعتماد) | docs/01 → docs/10 + فيديو |
+| 1 | البحث والتحليل والتصميم | ✅ مكتملة ومعتمدة (D-023..D-031) | docs/01 → docs/10 + `docs/02-requirements/detailed/` (7 وثائق) + فيديو v2 |
 | 2 | تأسيس Monorepo + البنية التحتية | ⏳ | apps/api, apps/web, packages/domain, Prisma schema, CI |
 | 3 | MVP Modules: Identity → Catalog → Inventory → Sales (POS) | ⏳ | وحدات تعمل + اختبارات |
 | 4 | Purchasing → Accounting → Stocktake → Reporting | ⏳ | وحدات تعمل + اختبارات |
