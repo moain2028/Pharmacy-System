@@ -32,9 +32,10 @@ export class AuthController {
   }
 
   @Get("me")
-  me(@CurrentUser() me: Principal) {
-    // `id` kept for backward compatibility; the web client reads `userId`/`displayName`.
-    return { id: me.userId, userId: me.userId, tenantId: me.tenantId, username: me.username, displayName: me.displayName, locale: me.locale, permissions: [...me.access.permissions].sort() };
+  async me(@CurrentUser() me: Principal) {
+    // The access token carries only the username; the display name comes from the user row so renames show up immediately.
+    const profile = await this.auth.profile(me.tenantId, me.userId);
+    return { id: me.userId, userId: me.userId, tenantId: me.tenantId, username: me.username, displayName: profile?.displayName ?? me.username, locale: profile?.locale ?? me.locale, permissions: [...me.access.permissions].sort() };
   }
 
   @Public() @Get("permissions")

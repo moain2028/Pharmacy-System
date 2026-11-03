@@ -4,16 +4,16 @@ import { useT } from "@/i18n";
 
 export function Spinner({ label }: { label?: string }) {
   const { t } = useT();
-  return <div role="status" className="flex items-center gap-2 p-4 text-sm text-slate-500"><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-brand-600" />{label ?? t("common.loading")}</div>;
+  return <div role="status" className="flex items-center gap-2 p-4 text-sm text-ink-500"><span className="h-4 w-4 animate-spin rounded-full border-2 border-ink-200 border-t-brand-600" />{label ?? t("common.loading")}</div>;
 }
 
 export function ErrorBox({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   const { t } = useT();
   const e = error instanceof ApiError ? error : null;
   return (
-    <div role="alert" className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-      <div className="font-medium">{e?.message ?? (error instanceof Error ? error.message : t("common.error"))}</div>
-      {e && <div className="mt-1 text-xs text-red-600">{e.code}{e.requestId ? ` · ${t("common.requestId")}: ${e.requestId}` : ""}</div>}
+    <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">
+      <div className="font-semibold">{e?.message ?? (error instanceof Error ? error.message : t("common.error"))}</div>
+      {e && <div className="mt-1 font-mono text-[11px] text-rose-600">{e.code}{e.requestId ? ` · ${t("common.requestId")}: ${e.requestId}` : ""}</div>}
       {onRetry && <button className="btn-secondary mt-2" onClick={onRetry}>{t("common.retry")}</button>}
     </div>
   );
@@ -21,7 +21,12 @@ export function ErrorBox({ error, onRetry }: { error: unknown; onRetry?: () => v
 
 export function Empty({ children }: { children?: ReactNode }) {
   const { t } = useT();
-  return <div className="p-8 text-center text-sm text-slate-500">{children ?? t("common.noData")}</div>;
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center text-sm text-ink-500">
+      <span className="grid h-12 w-12 place-items-center rounded-full bg-ink-100 text-ink-400"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5V20H3z" /><path d="M3 9.5h18" /></svg></span>
+      <div>{children ?? t("common.noData")}</div>
+    </div>
+  );
 }
 
 export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string | undefined; error?: string | undefined }) {
@@ -29,8 +34,8 @@ export function Field({ label, children, hint, error }: { label: string; childre
     <label className="block">
       <span className="label">{label}</span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-slate-500">{hint}</span>}
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+      {hint && !error && <span className="mt-1 block text-xs text-ink-500">{hint}</span>}
+      {error && <span className="mt-1 block text-xs font-medium text-rose-600">{error}</span>}
     </label>
   );
 }
@@ -42,24 +47,32 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [open, onClose]);
+  useEffect(() => { if (!open) return; const prev = document.body.style.overflow; document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = prev; }; }, [open]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onMouseDown={onClose}>
-      <div role="dialog" aria-modal="true" aria-label={title} className={`card w-full ${wide ? "max-w-4xl" : "max-w-lg"} max-h-[90vh] overflow-auto`} onMouseDown={(e) => e.stopPropagation()}>
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-semibold">{title}</h2><button aria-label="close" className="text-slate-400 hover:text-slate-700" onClick={onClose}>✕</button></div>
-        {children}
-        {footer && <div className="mt-4 flex justify-end gap-2">{footer}</div>}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/45 backdrop-blur-[2px] sm:items-center sm:p-4" onMouseDown={onClose}>
+      <div role="dialog" aria-modal="true" aria-label={title}
+        className={`flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-white shadow-pop animate-fade-up sm:rounded-2xl ${wide ? "sm:max-w-4xl" : "sm:max-w-lg"}`} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-ink-200 sm:hidden" aria-hidden="true" />
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-3 sm:px-5 sm:pt-4"><h2 className="text-lg">{title}</h2><button aria-label="close" className="btn-icon btn-ghost -me-2 h-9 w-9" onClick={onClose}>✕</button></div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin sm:px-5">{children}</div>
+        {footer && <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-ink-100 px-4 py-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:px-5">{footer}</div>}
       </div>
     </div>
   );
 }
 
-export function PageHeader({ title, actions }: { title: string; actions?: ReactNode }) {
-  return <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h1 className="text-xl font-semibold">{title}</h1><div className="flex gap-2">{actions}</div></div>;
+export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: ReactNode; actions?: ReactNode }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0"><h1 className="text-xl sm:text-2xl">{title}</h1>{subtitle && <div className="mt-0.5 text-sm text-ink-500">{subtitle}</div>}</div>
+      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+    </div>
+  );
 }
 
 export function Badge({ tone = "slate", children }: { tone?: "slate" | "green" | "red" | "amber" | "blue"; children: ReactNode }) {
-  const c = { slate: "bg-slate-100 text-slate-700", green: "bg-green-100 text-green-800", red: "bg-red-100 text-red-800", amber: "bg-amber-100 text-amber-800", blue: "bg-blue-100 text-blue-800" }[tone];
+  const c = { slate: "bg-ink-100 text-ink-700", green: "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200", red: "bg-rose-50 text-rose-800 ring-1 ring-rose-200", amber: "bg-amber-50 text-amber-800 ring-1 ring-amber-200", blue: "bg-sky-50 text-sky-800 ring-1 ring-sky-200" }[tone];
   return <span className={`badge ${c}`}>{children}</span>;
 }
 
@@ -75,8 +88,12 @@ export const toast = { ok: (t: string) => useToasts.getState().push("ok", t), er
 export function Toaster() {
   const { list, drop } = useToasts();
   return (
-    <div className="pointer-events-none fixed bottom-4 start-4 z-[60] flex flex-col gap-2">
-      {list.map((t) => <div key={t.id} onClick={() => drop(t.id)} className={`pointer-events-auto cursor-pointer rounded-md px-4 py-2 text-sm text-white shadow ${t.kind === "ok" ? "bg-green-600" : t.kind === "err" ? "bg-red-600" : "bg-slate-800"}`}>{t.text}</div>)}
+    <div className="toaster pointer-events-none fixed inset-x-3 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:start-4 sm:items-start" style={{ bottom: "calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + .75rem)" }} aria-live="polite">
+      {list.map((t) => (
+        <div key={t.id} role="status" onClick={() => drop(t.id)} className={`pointer-events-auto flex w-full max-w-sm cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-pop animate-fade-up ${t.kind === "ok" ? "bg-emerald-600" : t.kind === "err" ? "bg-rose-600" : "bg-ink-800"}`}>
+          <span aria-hidden="true">{t.kind === "ok" ? "✓" : t.kind === "err" ? "!" : "i"}</span><span className="flex-1">{t.text}</span>
+        </div>
+      ))}
     </div>
   );
 }
