@@ -1,4 +1,5 @@
 import type { MoneyJson } from "./api";
+import { localizeDigits } from "./prefs";
 
 export const MINOR_UNITS: Record<string, number> = { YER_OLD: 2, YER_NEW: 2, SAR: 2, USD: 2 };
 export const CURRENCY_LABEL: Record<string, { ar: string; en: string }> = {
@@ -15,7 +16,7 @@ export function fmtMinor(amountMinor: string | bigint | number, currency: string
   const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   const body = d > 0 ? `${grouped}.${frac}` : grouped;
   const sym = withSymbol ? ` ${CURRENCY_LABEL[currency]?.[locale] ?? currency}` : "";
-  return `${neg ? "\u2212" : ""}${body}${sym}`;
+  return `${neg ? "\u2212" : ""}${localizeDigits(body)}${sym}`;
 }
 export const fmtMoney = (m: MoneyJson | null | undefined, locale: "ar" | "en" = "ar") => (m ? fmtMinor(m.amountMinor, m.currency, locale) : "—");
 
