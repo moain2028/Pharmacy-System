@@ -164,3 +164,10 @@ Owner flagged: KPI number colliding with icon + currency wrapping; print preview
 - **Dark theme**: `ink` ramp + surfaces routed through CSS variables; `[data-theme=dark]` inverts the ramp (#E6ECED on #0E1517 = 15.5:1); semantic surfaces remapped. **Preferences** (Settings): language, appearance (system/light/dark), digits (0-9 / ٠-٩, receipts stay Latin), density. Stored per device (`pharmacore.prefs`), applied at boot + on OS change.
 - **Audit tooling**: `tools/ui-audit/crawl.mjs` now also flags text < 3:1 contrast and runs in dark with `THEME=dark`; `contrast.mjs` pinpoints offending nodes. Results: **light 51/51 clean, dark 51/51 clean** after fixing ink-400 text, dark hover rows, dark rose buttons.
 - Gates: tsc 0, eslint 0, web 44/44, API 98/98 (unchanged).
+
+## Session #13b — 2026-11-03 (handoff closure)
+Owner asked that everything be pushed and documented so a brand-new agent/session can continue without context:
+- `docs/00-handoff/PROJECT-STATE.md` rewritten as the single authoritative state: executive summary, phase table, done-by-layer, **ordered remaining tasks**, exact run/test/audit commands, rules, open questions, risks.
+- `AGENTS.md` §4 updated (was stale: "Phase 1, no code" → Phase 5, code complete ~98%, installer + UAT remaining).
+- `DECISIONS-LOG.md` D-032 records the design-system / IA / dark-theme / audit-gate decisions.
+- Working tree clean after merge; `origin` tokenless. **Where a new agent starts:** `AGENTS.md` → `PROJECT-STATE.md` §0 and §3.
