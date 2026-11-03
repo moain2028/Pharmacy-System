@@ -1,6 +1,6 @@
 # PROJECT-STATE — الحالة الحالية للمشروع (المصدر الوحيد للحقيقة)
 
-> **آخر تحديث:** 2026-11-03 — نهاية الجلسة #1
+> **آخر تحديث:** 2026-11-03 — نهاية الجلسة #4 (أول دفعة كود للمرحلة 2)
 > **من يحدّث هذا الملف:** أي وكيل/مطور في نهاية كل جلسة.
 > **قاعدة:** إذا تعارض هذا الملف مع أي ملف آخر، هذا الملف هو المرجع للحالة الحالية.
 
@@ -9,32 +9,32 @@
 ## 1. المرحلة الحالية
 | البند | القيمة |
 |---|---|
-| المرحلة | **Phase 1 — Discovery, Research & Architecture** |
+| المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~90%** — التوثيق مكتمل؛ بانتظار اعتماد الفريق + تأكيد العميل (المرحلة 0) |
-| هل يوجد كود تطبيق؟ | **لا** — التوثيق والتصميم فقط |
+| نسبة الإنجاز التقديرية للمرحلة | **~45%** — domain شبه مكتمل، db مكتمل، api: Identity/Catalog/Inventory؛ باقي Sales/Purchasing/Reports API + web + desktop |
+| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (747 اختبار، 99.6%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (36 اختبار E2E) |
 | الفرع النشط | `genspark_ai_developer` |
-| آخر PR | https://github.com/moain2028/Pharmacy-System/pull/1 |
+| آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
 
 ## 2. المهمة التالية بالضبط (Next Action)
-> **ابدأ من هنا إذا كنت وكيلاً جديداً.**
+> **ابدأ من هنا إذا كنت وكيلاً جديداً.** اقرأ `AGENTS.md` ثم هذا الملف ثم `SESSION-LOG.md` (#4).
 
-**المرحلة 1 (التوثيق) مكتملة + المتطلبات التفصيلية "حرف حرف" مكتملة (Session #3).** قرارات المالك D-023..D-031 معتمدة (Stack، Windows أولاً، ثنائي اللغة، وحدات مرنة، 4 عملات، خصومات بضوابط، سعر رسمي، صلاحيات دقيقة، فريق الوكلاء).
-**المهمة التالية بالضبط = بدء الكود (المرحلة 2 — الأساس)** بفريق الوكلاء وفق D-031، بالترتيب:
-1. Monorepo (pnpm + Turborepo) + CI (typecheck/lint/test) + `tools/agents` جاهز.
-2. `packages/domain`: `Money` (BIGINT minor + currency، Half-Up، allocate)، `Quantity` (SSU BIGINT)، `UnitConversion` (factor_to_ssu + snapshot)، `Result`، UUIDv7 — تغطية 100%.
-3. `packages/db`: Drizzle schema بالقاموس الموحّد (`07-CROSS-REVIEW §4`) + هجرات SQL + Triggers (append-only، protect_posted، balanced_entry) + اختبارات تثبت الرفض.
-4. `apps/api` (NestJS/Fastify، Hexagonal): Identity (Argon2id/JWT/permissions `resource.action`) → Catalog+Units → Inventory/Lots/FEFO → Sales+Shifts → Purchasing → Cash/Expenses → Reports.
-5. `apps/web` React RTL/LTR i18n + شاشة POS لوحة-مفاتيح-أولاً.
-6. `apps/desktop` Tauri 2 + تغليف PostgreSQL كخدمة Windows + مثبّت (يحتاج جهاز Windows للاختبار النهائي — عند الفريق).
-المهام البشرية المتبقية (لا تعطّل الكود):
-1. **الفريق يشاهد `media/video/explainer.mp4` (v2 — Motion Graphics، بدون أسماء) ويراجع التوثيق** → يسجّل ملاحظاته كـ Issues أو تعديلات على الملفات.
-   - قرار جديد يحتاج تأكيد الفريق: **D-022** (وضع تجاري في الواجهة + محرك قيد مزدوج داخلي + علم `accounting_full`).
-2. **اعتماد ADR-002 (Tech Stack)** — تصويت معين/مازن/عبدالكريم → تغيير الحالة من Proposed إلى Accepted في `adr/README.md` و`DECISIONS-LOG` (P-001, P-002).
-3. **المرحلة 0:** جلسة مع صاحب الصيدلية باستخدام `docs/02-requirements/CLIENT-QUESTIONNAIRE.md` → إغلاق Q1–Q7 هنا وتحديث أولويات SRS.
-4. **اعتماد التسعير** (P-003) من `docs/10-business/PRICING.md` → إعداد العرض للعميل → استلام المقدم (M0).
-5. **بدء المرحلة 2 (الأساس)** حسب `docs/09-delivery/ROADMAP.md` WBS-2: Monorepo + CI + packages/domain/shared + Prisma schema + Triggers. أول PR كود يجب أن يحتوي: `Money`, `Quantity`, `Result`, UUIDv7 generator باختبارات 100%.
-6. ملاحظة: أي وكيل يبدأ الكود **يجب** أن يقرأ `ENGINEERING-RULES.md` و`DOMAIN-MODEL.md` و`DATA-MODEL.md` أولاً.
+**ما تم (Session #4 — PR #3):**
+- Monorepo pnpm+Turbo، TS strict، eslint؛ CI workflow في `ci/github/ci.yml` (**يحتاج المالك نقله إلى `.github/workflows/`** لأن توكن التطبيق لا يملك صلاحية workflows).
+- `packages/domain` (نقي، بلا I/O): kernel (Result/Money/Currency/Quantity) + fx + pricing/discount + inventory (Lot/FEFO/StockMovement/expiry/bonus) + accounting (CoA/JournalEntry/posting rules) + iam + audit + sales (SalesInvoice/totals/guards/payment/return) + cash (CashMovement/Cashbox/Shift) + purchasing (PurchaseOrder/GoodsReceipt). **747 اختبار، 99.6% statements / 98.2% branches** (العتبات 99/97).
+- `packages/db`: `migrations/0001_foundation.sql` (62 جدولاً، triggers P0001..P0010، RLS FORCE، دور `pharmacore_app`)، runner بالـ checksum، `withTenant()`، 35 اختباراً تُثبت رفض كل مخالفة.
+- `apps/api` NestJS/Fastify: Identity (Argon2id، JWT + refresh دوّار مع كشف إعادة الاستخدام، قفل بعد 5 محاولات، صلاحيات `resource.action` + overrides، معالج الإعداد الأولي)، Catalog (أصناف + سلّم وحدات مرن + باركود GS1 + أسعار + سعر رسمي + أسعار صرف)، Inventory (استلام، أرصدة، FEFO preview، حالات الدفعات، تسويات، تحويلات، كاردكس، worklist الانتهاء). **36 اختبار E2E** على PostgreSQL حقيقي.
+
+**المهمة التالية بالضبط (بالترتيب):**
+1. **domain المتبقي:** `purchasing/supplier-invoice.ts` + `purchase-return.ts` + `supplier-ledger.ts` (وكيل B5 انقطع — المخرج الجزئي في `.tmp_agents/B5-purchasing-payables.json` غير صالح؛ أعد التشغيل بتقسيم أصغر، max_tokens 26000) و`accounting/posting-rules-treasury.ts`. رفع العتبات إلى 100% بعد تغطية الفروع المتبقية في `sales-invoice.ts`.
+2. **apps/api — Sales + Shifts:** افتح/أغلق وردية، فاتورة بيع (DRAFT→POSTED داخل معاملة واحدة: SALE movements + journal entry + cash_movements + invoice_payments) باستخدام `SalesInvoice`/`settleInvoice`/`postSale*` من domain؛ مرتجعات؛ عملاء. ثم Purchasing (PO/GRN/Supplier invoice/returns/payments) ثم Cash/Expenses ثم Reports.
+3. OpenAPI (`@nestjs/swagger` مثبّت) + حزمة i18n لرسائل الأخطاء (ar/en) حسب `code`.
+4. `apps/web` React + Vite + Tailwind RTL/LTR + POS لوحة-مفاتيح-أولاً.
+5. `apps/desktop` Tauri 2 + PostgreSQL مضمّن كخدمة Windows + مثبّت (اختبار نهائي على جهاز Windows عند الفريق).
+
+**قواعد تشغيل الوكلاء (مستفادة):** استخدم `tools/agents/run_agents.py` (SSE)؛ النماذج المسموحة فقط `claude-opus-5-5` و`claude-fable-5-1`؛ مهام ≤ 2–3 ملفات لكل وكيل، `max_tokens ≤ 26000`، وإلا يقطع الناتج (`fin=length`)؛ استخدم `tools/agents/salvage.py` لاستخراج الملفات الكاملة من JSON مقطوع. **عطّل core dumps** (`ulimit -c 0`) — تسرّب ملف core بحجم 2.3GB مرة وتم تنظيفه من التاريخ.
+
+**قاعدة بيانات الاختبار محلياً:** `postgres://pharmacore:pharmacore@localhost:5432/pharmacore_test` (PostgreSQL 17 في الـ sandbox؛ الهدف الرسمي 16).
 
 ## 3. خارطة المراحل الكلية
 | # | المرحلة | الحالة | المخرجات الرئيسية |

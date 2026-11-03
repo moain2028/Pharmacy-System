@@ -60,3 +60,17 @@
 - النقاط المعلّقة: P-001/P-002 (Stack/DB)، P-003 (السعر)، Q1–Q9.
 - **لا تبدأ الكود قبل M0** (اعتماد + مقدم) — انظر RISK-REGISTER R01/R02.
 - إحصاء: ~35 ملف توثيق، ~110 KB نص عربي/إنجليزي، 21 قرار موثق، 12 ADR، ~100 متطلب.
+
+
+---
+
+## Session #4 — 2026-11-03 — بدء كود المرحلة 2 (PR #3)
+**الطلب:** "أنت المتحكم… انطلق بأقوى قوة… لا تتوقف حتى تنتهي" + قصر الوكلاء على Opus 5.5 / Fable 5.1.
+**ما تم:**
+- Scaffold monorepo + domain kernel (commit 2a29380) → migration 0001 + db tests (fed02f8) → A1 pricing/fx (fb12f2d) → API Identity + setup wizard (a8f6d18) → A2 inventory (953eb17) → A4/A6 accounting/iam/audit (ebc7ca9) → API Catalog (4f98c9f) → API Inventory (9d2b14d) → B1–B4 sales/cash/purchasing (41138e0).
+- **أرقام:** domain 747 اختبار (99.6%/98.2%)، db 35، api 36؛ tsc strict + eslint نظيفان على كامل المستودع.
+- إصلاحات جوهرية اكتشفتها الاختبارات: view `stock_balances` كانت تتجاوز RLS → `security_invoker`؛ جداول `user_roles/overrides/refresh_tokens` بلا tenant_id/RLS → أُصلحت؛ `AuditEvent` كان يسرّب Date قابلاً للتعديل → getter بنسخة دفاعية؛ أعمدة `date` كانت تُقرأ كـ Date وتنزاح بالمنطقة الزمنية → تُقرأ كنص ISO؛ توحيد `RATE_SCALE` على 1e6 (الوكيل المحاسبي استخدم 1e8).
+- وكلاء فشلوا/قُطعوا: A3, A5 (empty stream بعد ~28 دقيقة) → أُعيد تقسيمهم إلى B1–B5؛ B5 (supplier-invoice/purchase-return/supplier-ledger) قُطع ولم يُدمج.
+- CI workflow نُقل إلى `ci/github/` لأن GitHub يرفض دفع workflows من توكن التطبيق.
+**PR:** https://github.com/moain2028/Pharmacy-System/pull/3
+**التالي:** انظر PROJECT-STATE §2.
