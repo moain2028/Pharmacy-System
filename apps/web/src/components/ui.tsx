@@ -59,8 +59,8 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
     const trap = (e: KeyboardEvent) => {
       if (e.key !== "Tab" || !panel.current) return;
       const f = [...panel.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter((x) => x.offsetParent !== null);
-      if (f.length === 0) return;
-      const first = f[0]!, last = f[f.length - 1]!;
+      const first = f[0], last = f[f.length - 1];
+      if (!first || !last) return;
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     };

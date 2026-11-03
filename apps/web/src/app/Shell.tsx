@@ -1,51 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useT } from "@/i18n";
 import { Toaster } from "@/components/ui";
-import { Icons, type IconName } from "@/components/icons";
+import { Icons } from "@/components/icons";
+import { NAV_SECTIONS, NAV_ITEMS, isActivePath, breadcrumbsFor } from "./nav";
+import { useShortcuts, ShortcutSheet } from "./shortcuts";
 
-/**
- * Navigation model.
- * Groups mirror how a pharmacy actually works (sell → stock → buy → money → admin), so the sidebar
- * reads as a workflow rather than an alphabetical dump. `perm` hides entries the user may not use.
- * `mobile` marks the five entries that earn a slot in the bottom bar; the rest live in the drawer.
- */
-export interface NavItem { to: string; key: string; icon: IconName; perm?: string; mobile?: boolean }
-export interface NavGroup { key: string; items: NavItem[] }
-export const NAV_GROUPS: NavGroup[] = [
-  { key: "nav.group.sell", items: [
-    { to: "/", key: "nav.dashboard", icon: "dashboard", mobile: true },
-    { to: "/pos", key: "nav.pos", icon: "pos", perm: "sales.create", mobile: true },
-    { to: "/sales", key: "nav.sales", icon: "sales", perm: "sales.read" },
-    { to: "/returns", key: "nav.returns", icon: "returns", perm: "returns.create" },
-    { to: "/customers", key: "nav.customers", icon: "customers", perm: "customers.read" },
-  ] },
-  { key: "nav.group.stock", items: [
-    { to: "/items", key: "nav.items", icon: "items", perm: "items.read", mobile: true },
-    { to: "/inventory", key: "nav.inventory", icon: "inventory", perm: "stock.read" },
-    { to: "/expiry", key: "nav.expiry", icon: "expiry", perm: "expiry.read" },
-  ] },
-  { key: "nav.group.buy", items: [
-    { to: "/purchasing", key: "nav.purchasing", icon: "purchasing", perm: "purchase_orders.read" },
-    { to: "/suppliers", key: "nav.suppliers", icon: "suppliers", perm: "suppliers.read" },
-    { to: "/payables", key: "nav.payables", icon: "payables", perm: "supplier_invoices.read" },
-  ] },
-  { key: "nav.group.money", items: [
-    { to: "/cash", key: "nav.cash", icon: "cash", perm: "shifts.read", mobile: true },
-    { to: "/expenses", key: "nav.expenses", icon: "expenses", perm: "cash.expense" },
-    { to: "/reports", key: "nav.reports", icon: "reports", perm: "reports.sales" },
-    { to: "/accounting", key: "nav.accounting", icon: "accounting", perm: "journal.read" },
-  ] },
-  { key: "nav.group.admin", items: [
-    { to: "/users", key: "nav.users", icon: "users", perm: "users.read" },
-    { to: "/settings", key: "nav.settings", icon: "settings", perm: "settings.read" },
-  ] },
-];
-/** Flat list kept for existing consumers/tests. */
-export const NAV: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
-
-const isActivePath = (pathname: string, to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(to + "/"));
+export { NAV_ITEMS as NAV } from "./nav";
 
 function Brand({ compact = false }: { compact?: boolean }) {
   const { t } = useT();
@@ -60,26 +23,55 @@ function Brand({ compact = false }: { compact?: boolean }) {
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useT();
   const { can } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const currentTab = new URLSearchParams(search).get("tab");
+  const [open, setOpen] = useState<Record<string, boolean>>({});
   return (
-    <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-3 scrollbar-thin" aria-label={t("nav.main")}>
-      {NAV_GROUPS.map((g) => {
+    <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-3 scrollbar-thin" aria-label={t("nav.main")}>
+      {NAV_SECTIONS.map((g) => {
         const items = g.items.filter((n) => !n.perm || can(n.perm));
         if (items.length === 0) return null;
+        const hid = `nav-${g.key.replace(/\W/g, "-")}`;
         return (
           <div key={g.key}>
-            <div className="mb-1.5 px-3 text-[11px] font-semibold text-ink-500">{t(g.key)}</div>
-            <ul className="space-y-0.5">
+            <h2 id={hid} className="mb-1 px-3 text-[11px] font-semibold text-ink-500">{t(g.key)}</h2>
+            <ul aria-labelledby={hid} className="space-y-0.5">
               {items.map((n) => {
                 const Icon = Icons[n.icon];
                 const active = isActivePath(pathname, n.to);
+                const kids = n.children ?? [];
+                const hasKids = kids.length > 0;
+                const expanded = hasKids && (open[n.to] ?? active);
+                const firstTab = kids[0]?.tab;
                 return (
                   <li key={n.to}>
-                    <NavLink to={n.to} end={n.to === "/"} onClick={onNavigate} aria-current={active ? "page" : undefined}
-                      className={`group relative flex min-h-[2.75rem] items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${active ? "bg-brand-50 text-brand-800 before:absolute before:inset-y-2 before:start-0 before:w-[3px] before:rounded-e before:bg-brand-700" : "text-ink-700 hover:bg-ink-100 hover:text-ink-900"}`}>
-                      <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-brand-700" : "text-ink-500 group-hover:text-brand-700"}`} />
-                      <span className="truncate">{t(n.key)}</span>
-                    </NavLink>
+                    <div className="flex items-stretch">
+                      <NavLink to={n.to} end={n.to === "/"} onClick={onNavigate} aria-current={active ? "page" : undefined}
+                        className={`group relative flex min-h-[2.75rem] min-w-0 flex-1 items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${active ? "bg-brand-50 text-brand-800 before:absolute before:inset-y-2 before:start-0 before:w-[3px] before:rounded-e before:bg-brand-700" : "text-ink-700 hover:bg-ink-100 hover:text-ink-900"}`}>
+                        <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-brand-700" : "text-ink-500 group-hover:text-brand-700"}`} />
+                        <span className="truncate">{t(n.key)}</span>
+                        {n.chord && <span className="kbd ms-auto hidden [@media(pointer:fine)]:inline-flex">g {n.chord.replace("Key", "").toLowerCase()}</span>}
+                      </NavLink>
+                      {hasKids && (
+                        <button type="button" aria-expanded={expanded} aria-controls={`${hid}-${n.icon}`} aria-label={t(n.key)} onClick={() => setOpen((o) => ({ ...o, [n.to]: !expanded }))}
+                          className="grid w-9 shrink-0 place-items-center rounded-lg text-ink-400 hover:bg-ink-100 hover:text-ink-700">
+                          <Icons.chevron className={`h-4 w-4 transition-transform rtl:rotate-180 ${expanded ? "rotate-90 rtl:rotate-90" : ""}`} />
+                        </button>
+                      )}
+                    </div>
+                    {hasKids && expanded && (
+                      <ul id={`${hid}-${n.icon}`} className="ms-[1.9rem] mt-0.5 space-y-0.5 border-s border-ink-200 ps-3">
+                        {kids.map((c) => {
+                          const subActive = active && (currentTab ?? firstTab) === c.tab;
+                          return (
+                            <li key={c.tab}>
+                              <Link to={`${n.to}?tab=${c.tab}`} onClick={onNavigate} aria-current={subActive ? "page" : undefined}
+                                className={`block min-h-[2.25rem] rounded-md px-2 py-1.5 text-[13px] leading-5 ${subActive ? "font-semibold text-brand-800" : "text-ink-600 hover:bg-ink-100 hover:text-ink-900"}`}>{t(c.key)}</Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}
@@ -87,6 +79,30 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         );
       })}
+    </nav>
+  );
+}
+
+function Breadcrumbs() {
+  const { t } = useT();
+  const { pathname, search } = useLocation();
+  const crumbs = breadcrumbsFor(pathname, search);
+  if (crumbs.length === 0) return null;
+  return (
+    <nav aria-label={t("nav.breadcrumb")} className="min-w-0 flex-1">
+      <ol className="flex min-w-0 items-center gap-1 text-sm">
+        {crumbs.map((c, i) => {
+          const last = i === crumbs.length - 1;
+          const label = c.key ? t(c.key) : c.label ?? "";
+          return (
+            <li key={i} className={`flex min-w-0 items-center gap-1 ${i === 0 ? "hidden sm:flex" : ""}`}>
+              {i > 0 && <Icons.chevron className="h-3.5 w-3.5 shrink-0 text-ink-300 rtl:rotate-180" aria-hidden="true" />}
+              {last || !c.to ? <span className={`truncate ${last ? "font-semibold text-ink-900" : "text-ink-500"}`} aria-current={last ? "page" : undefined}>{label}</span>
+                : <Link to={c.to} className="truncate text-ink-500 hover:text-brand-700">{label}</Link>}
+            </li>
+          );
+        })}
+      </ol>
     </nav>
   );
 }
@@ -125,9 +141,10 @@ export default function Shell() {
     return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", h); };
   }, [drawer]);
 
-  const current = NAV.find((n) => isActivePath(pathname, n.to));
-  const mobileItems = NAV.filter((n) => n.mobile && (!n.perm || can(n.perm))).slice(0, 4);
+  const mobileItems = NAV_ITEMS.filter((n) => n.mobile && (!n.perm || can(n.perm))).slice(0, 4);
   const isPos = pathname.startsWith("/pos");
+  const [sheet, setSheet] = useState(false);
+  useShortcuts({ onHelp: () => setSheet((v) => !v), onMenu: () => setDrawer((v) => !v) });
 
   return (
     <div dir={dir} className="min-h-screen bg-ink-50" style={{ ["--slide-from" as string]: dir === "rtl" ? "100%" : "-100%" }}>
@@ -154,9 +171,10 @@ export default function Shell() {
       <header data-topbar className="sticky top-0 z-20 flex h-[var(--topbar-h)] items-center gap-2 border-b border-ink-200/80 bg-white/90 px-3 backdrop-blur lg:ms-[var(--sidebar-w)] lg:px-6">
         <button className="btn-icon btn-ghost lg:hidden" aria-label={t("nav.menu")} aria-expanded={drawer} onClick={() => setDrawer(true)}><Icons.menu className="h-5 w-5" /></button>
         <div className="lg:hidden"><Brand compact /></div>
-        <div className="min-w-0 flex-1 truncate ps-1 text-sm font-semibold text-ink-700 lg:text-base">{current ? t(current.key) : t("app.name")}</div>
+        <div className="min-w-0 flex-1 ps-1"><Breadcrumbs /></div>
+        <button type="button" className="btn-ghost btn-icon hidden [@media(pointer:fine)]:inline-flex" aria-label={t("nav.shortcuts")} title={`${t("nav.shortcuts")} (?)`} onClick={() => setSheet(true)}><span className="kbd text-xs">?</span></button>
         {!isPos && can("sales.create") && (
-          <NavLink to="/pos" className="btn-primary btn-sm hidden sm:inline-flex"><Icons.pos className="h-4 w-4" />{t("nav.pos")}<span className="kbd ms-1 hidden md:inline-flex">F1</span></NavLink>
+          <NavLink to="/pos" className="btn-primary btn-sm hidden sm:inline-flex"><Icons.pos className="h-4 w-4" />{t("nav.pos")}<span className="kbd ms-1 hidden [@media(pointer:fine)]:inline-flex">F2</span></NavLink>
         )}
       </header>
 
@@ -184,6 +202,7 @@ export default function Shell() {
           </button>
         </nav>
       )}
+      <ShortcutSheet open={sheet} onClose={() => setSheet(false)} />
       <Toaster />
     </div>
   );

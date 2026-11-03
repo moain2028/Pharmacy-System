@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useTab } from "@/lib/useTab";
 import { useT } from "@/i18n";
 import { ErrorBox, PageHeader, Spinner } from "@/components/ui";
 import { useLocations } from "./ItemPicker";
@@ -10,7 +10,7 @@ const LABEL: Record<Tab, string> = { receive: "inv.tabReceive", adjust: "inv.tab
 
 export default function InventoryPage() {
   const { t } = useT();
-  const [tab, setTab] = useState<Tab>("receive");
+  const [tab, setTab] = useTab<Tab>(TABS);
   const locs = useLocations();
   const locations = locs.data ?? [];
   const body = () => {
