@@ -1,0 +1,3 @@
+PharmaCore — Proprietary software licensed to the purchasing pharmacy.
+فارماكور — برنامج مرخّص للصيدلية المشترية. يُمنع النسخ أو إعادة التوزيع دون إذن كتابي.
+See docs/06-security/LICENSING-DESIGN.md in the project repository for the licensing model.

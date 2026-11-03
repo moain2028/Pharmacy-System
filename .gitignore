@@ -26,3 +26,9 @@ coverage/
 *.tsbuildinfo
 core
 core.*
+
+# desktop build artefacts
+apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/sidecar/
+apps/desktop/src-tauri/resources/
+apps/desktop/src-tauri/gen/
