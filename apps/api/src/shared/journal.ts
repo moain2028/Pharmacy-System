@@ -3,6 +3,7 @@ import { ExchangeRate, Money, RATE_SCALE, type CurrencyCode, type JournalEntry }
 import { ApiError } from "./errors.js";
 
 /** Shared JSON serializer: bigint → string, Money → {currency, amountMinor}. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const J = (v: unknown): any =>
   JSON.parse(JSON.stringify(v, (_k, x) => (typeof x === "bigint" ? x.toString() : x instanceof Money ? { currency: x.currency, amountMinor: x.amountMinor.toString() } : x)));
 
