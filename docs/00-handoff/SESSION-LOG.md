@@ -122,3 +122,10 @@
 - Still running / not yet integrated: E1-pos, E2a-items, E2b-inventory-expiry, E5a-reports (`.tmp_agents/jobs_web2.json`; relaunch with smaller max_tokens if stalled).
 - Open: smoke step "on hand 480 SSU after GRN (got 0)" — investigate GRN-via-PO path in `purchasing.service.ts` (stock_movements/lot creation) vs `GET /inventory/items/:id/balances` shape.
 - Security: `origin` reset to tokenless URL; owner PAT must be revoked by owner.
+
+## Session #9 — 2026-11-03 (continuation)
+- Integrated the last 4 UI modules: **POS** (scan/search, cart, live quote, pay with multi-tender + override modal, hold/resume, F2/F4/F9 hotkeys; ShiftBar open/X/Z-close with variance reasons + approver — completed by hand after model truncation), **items**, **inventory + expiry**, **reports**. All 16 features now real (no placeholders). `i18n/register-features.ts` registers every dictionary.
+- Web: tsc 0, eslint clean, vitest **44/44**, vite build OK; `/login` renders live with zero console errors.
+- **API bug fixed:** postgres.js `tx.array()` inside `ANY()` fails on single-element arrays (`uuid = text` / malformed literal) → 500 on allocated customer receipts. All sites now bind plain arrays with explicit `::uuid[]`/`::text[]` casts (returns, purchasing, payables, treasury, import). Regression test added (treasury e2e → 7). API suite **94/94**.
+- Smoke `tools/smoke/pharmacy-day.mjs` now **passes end-to-end** (setup → PO/GRN → sale/change/COGS → return → expense → credit sale → receipt → supplier invoice/payment → X/Z → trial balance/P&L/balance sheet/valuation → backup+checksum). Added as a CI step against the built API.
+- Ops note: `fuser -k 3100/tcp` does not see the server in this sandbox — use `ss -ltnp | grep 3100` and `kill -9 <pid>`.
