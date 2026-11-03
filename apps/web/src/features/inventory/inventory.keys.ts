@@ -1,0 +1,28 @@
+export const inventoryAr: Record<string, string> = {
+  "inv.title": "المخزون", "inv.tabReceive": "استلام", "inv.tabAdjust": "تسوية", "inv.tabTransfer": "تحويل", "inv.tabLotStatus": "حالة اللوط",
+  "inv.item": "الصنف", "inv.searchItem": "ابحث عن صنف (اسم / كود / باركود)", "inv.noResults": "لا توجد نتائج", "inv.change": "تغيير",
+  "inv.location": "الموقع", "inv.selectLocation": "اختر الموقع", "inv.fromLocation": "من موقع", "inv.toLocation": "إلى موقع",
+  "inv.unit": "الوحدة", "inv.qty": "الكمية", "inv.qtySsu": "الكمية (بأصغر وحدة)", "inv.qtyDelta": "فرق الكمية (+/-) بأصغر وحدة",
+  "inv.lot": "اللوط", "inv.selectLot": "اختر اللوط", "inv.lotNumber": "رقم اللوط", "inv.noLots": "لا توجد أرصدة لهذا الصنف", "inv.noExpiry": "بدون صلاحية",
+  "inv.expiryDate": "تاريخ الصلاحية", "inv.unitCost": "تكلفة الوحدة", "inv.costCurrency": "عملة التكلفة", "inv.businessDate": "تاريخ العملية",
+  "inv.movementType": "نوع الحركة", "inv.mt.ADJUSTMENT": "تسوية", "inv.mt.STOCKTAKE": "جرد",
+  "inv.status": "الحالة الجديدة", "inv.status.NONE": "طبيعي", "inv.status.QUARANTINED": "حجر", "inv.status.BLOCKED": "محظور", "inv.status.RETURNED_TO_SUPPLIER": "مرتجع للمورد", "inv.status.DESTROYED": "متلف",
+  "inv.submitReceive": "تسجيل الاستلام", "inv.submitAdjust": "تسجيل التسوية", "inv.submitTransfer": "تنفيذ التحويل", "inv.submitStatus": "تحديث الحالة",
+  "inv.receiveOk": "تم تسجيل استلام اللوط {lot}", "inv.adjustOk": "تم تسجيل التسوية", "inv.transferOk": "تم تنفيذ التحويل", "inv.statusOk": "تم تحديث حالة اللوط",
+  "inv.errPositiveInt": "أدخل عدداً صحيحاً موجباً", "inv.errNonZeroInt": "أدخل عدداً صحيحاً غير صفري (مثال: -3 أو 5)", "inv.errMoney": "مبلغ غير صالح",
+  "inv.errReasonMin": "السبب يجب أن يكون حرفين على الأقل", "inv.errSameLocation": "موقع المصدر والهدف متطابقان", "inv.errExceedsOnHand": "الكمية أكبر من الرصيد المتاح",
+};
+export const inventoryEn: Record<string, string> = {
+  "inv.title": "Inventory", "inv.tabReceive": "Receive", "inv.tabAdjust": "Adjust", "inv.tabTransfer": "Transfer", "inv.tabLotStatus": "Lot status",
+  "inv.item": "Item", "inv.searchItem": "Search item (name / code / barcode)", "inv.noResults": "No results", "inv.change": "Change",
+  "inv.location": "Location", "inv.selectLocation": "Select location", "inv.fromLocation": "From location", "inv.toLocation": "To location",
+  "inv.unit": "Unit", "inv.qty": "Quantity", "inv.qtySsu": "Quantity (SSU)", "inv.qtyDelta": "Quantity delta (+/-) in SSU",
+  "inv.lot": "Lot", "inv.selectLot": "Select lot", "inv.lotNumber": "Lot number", "inv.noLots": "No lot balances for this item", "inv.noExpiry": "No expiry",
+  "inv.expiryDate": "Expiry date", "inv.unitCost": "Unit cost", "inv.costCurrency": "Cost currency", "inv.businessDate": "Business date",
+  "inv.movementType": "Movement type", "inv.mt.ADJUSTMENT": "Adjustment", "inv.mt.STOCKTAKE": "Stocktake",
+  "inv.status": "New status", "inv.status.NONE": "Normal", "inv.status.QUARANTINED": "Quarantined", "inv.status.BLOCKED": "Blocked", "inv.status.RETURNED_TO_SUPPLIER": "Returned to supplier", "inv.status.DESTROYED": "Destroyed",
+  "inv.submitReceive": "Post receipt", "inv.submitAdjust": "Post adjustment", "inv.submitTransfer": "Post transfer", "inv.submitStatus": "Update status",
+  "inv.receiveOk": "Receipt posted for lot {lot}", "inv.adjustOk": "Adjustment posted", "inv.transferOk": "Transfer posted", "inv.statusOk": "Lot status updated",
+  "inv.errPositiveInt": "Enter a positive whole number", "inv.errNonZeroInt": "Enter a non-zero whole number (e.g. -3 or 5)", "inv.errMoney": "Invalid amount",
+  "inv.errReasonMin": "Reason must be at least 2 characters", "inv.errSameLocation": "Source and destination locations are the same", "inv.errExceedsOnHand": "Quantity exceeds on-hand",
+};
