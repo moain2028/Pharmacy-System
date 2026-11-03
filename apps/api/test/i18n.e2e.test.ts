@@ -30,3 +30,15 @@ describe("error envelope localisation", () => {
     expect(r.body.error.message).toBe("البيانات المدخلة غير صالحة");
   });
 });
+
+describe("openapi", () => {
+  it("serves the OpenAPI document with all controllers", async () => {
+    const res = await c.app.inject({ method: "GET", url: "/api/docs.json" });
+    expect(res.statusCode).toBe(200);
+    const doc = res.json() as { openapi: string; paths: Record<string, unknown> };
+    expect(doc.openapi).toMatch(/^3\./);
+    const paths = Object.keys(doc.paths);
+    expect(paths.length).toBeGreaterThan(80);
+    for (const p of ["/api/v1/sales", "/api/v1/shifts/open", "/api/v1/returns", "/api/v1/purchase-orders", "/api/v1/supplier-invoices", "/api/v1/reports/trial-balance", "/api/v1/backup"]) expect(paths).toContain(p);
+  });
+});
