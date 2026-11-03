@@ -21,3 +21,6 @@ media/video/explainer_preview.mp4
 media/video/build.log
 .tmp_agents/
 media/video/share/
+coverage/
+.turbo/
+*.tsbuildinfo

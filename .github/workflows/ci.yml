@@ -1,0 +1,27 @@
+name: CI
+on:
+  push: { branches: [main, genspark_ai_developer] }
+  pull_request: { branches: [main] }
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: pharmacore, POSTGRES_PASSWORD: pharmacore, POSTGRES_DB: pharmacore_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pharmacore" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://pharmacore:pharmacore@localhost:5432/pharmacore_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test:coverage
