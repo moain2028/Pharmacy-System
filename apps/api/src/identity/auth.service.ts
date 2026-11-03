@@ -111,6 +111,14 @@ export class AuthService {
     });
   }
 
+  /** Display name + locale straight from the user row (not the token). */
+  async profile(tenantId: string, userId: string): Promise<{ displayName: string; locale: "ar" | "en" } | null> {
+    return this.db.tx(tenantId, async (tx) => {
+      const [u] = await tx<{ display_name: string; locale: "ar" | "en" }[]>`SELECT display_name, locale FROM users WHERE id = ${userId}`;
+      return u ? { displayName: u.display_name, locale: u.locale } : null;
+    });
+  }
+
   async logout(tenantId: string, userId: string, refreshToken?: string | undefined): Promise<void> {
     await this.db.tx(tenantId, async (tx) => {
       if (refreshToken) await tx`UPDATE refresh_tokens SET revoked_at = now() WHERE token_hash = ${TokenService.hashRefresh(refreshToken)} AND revoked_at IS NULL`;

@@ -67,29 +67,55 @@ export default function PosPage() {
   }, [openPay, hold]);
 
   const total = quote.data?.totals.total;
+  const warnLabel = (code: string) => { const k = `warn.${code}`; const v = t(k); return v === k ? code : v; };
+  const lineCount = cart.lines.reduce((a, l) => a + l.qtyInUnit, 0);
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 pb-28 lg:pb-0">
       <ShiftBar selectRef={cashboxRef} />
-      <div className="grid gap-3 lg:grid-cols-[1fr_22rem]">
-        <div className="space-y-3">
-          <PosSearch inputRef={searchRef} onPick={addItem} />
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="min-w-0 space-y-3">
+          <div className="sticky top-[calc(var(--topbar-h)+.25rem)] z-10 -mx-3 bg-ink-50/95 px-3 py-2 backdrop-blur sm:static sm:m-0 sm:bg-transparent sm:p-0">
+            <PosSearch inputRef={searchRef} onPick={addItem} />
+          </div>
           {quote.error && <ErrorBox error={quote.error} onRetry={() => void quote.refetch()} />}
           <Cart quote={quote.data} />
         </div>
-        <aside className="card sticky top-3 h-fit space-y-3" aria-label={t("pos.total")}>
-          <div className="text-sm text-slate-500">{t("pos.total")}</div>
-          <div className="num text-4xl font-bold">{total ? fmtMoney(total, locale) : "—"}</div>
-          {quote.isFetching && <div className="text-xs text-slate-400">{t("pos.recalc")}</div>}
-          {(quote.data?.warnings.length ?? 0) > 0 && (
-            <ul className="space-y-1 text-xs text-amber-700">{quote.data?.warnings.map((w, i) => <li key={i}>⚠ {t(`warn.${w.code}`) === `warn.${w.code}` ? w.code : t(`warn.${w.code}`)}</li>)}</ul>
-          )}
-          <button className="btn-primary w-full py-3 text-lg" disabled={cart.lines.length === 0 || !total} onClick={openPay}>{t("pos.pay")}</button>
-          <div className="grid grid-cols-3 gap-2 text-sm">
-            <button className="btn-secondary" onClick={hold}>{t("pos.hold")}</button>
-            <button className="btn-secondary" onClick={() => setHeldOpen(true)}>{t("pos.heldList")} <span className="num">({held.length})</span></button>
-            <button className="btn-secondary" onClick={clear}>{t("pos.clear")}</button>
+
+        {/* Desktop summary column */}
+        <aside className="hidden lg:block" aria-label={t("pos.total")}>
+          <div className="card sticky top-[calc(var(--topbar-h)+1.5rem)] space-y-4">
+            <div>
+              <div className="text-xs font-semibold text-ink-500">{t("pos.total")}</div>
+              <div className="num mt-1 text-4xl font-extrabold leading-none text-ink-900">{total ? fmtMoney(total, locale) : "—"}</div>
+              <div className="mt-1 text-xs text-ink-500">{cart.lines.length} {t("pos.item")} · <span className="num">{lineCount}</span> {t("common.quantity")}{quote.isFetching ? ` · ${t("pos.recalc")}` : ""}</div>
+            </div>
+            {(quote.data?.warnings.length ?? 0) > 0 && (
+              <ul className="space-y-1 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">{quote.data?.warnings.map((w, i) => <li key={i}>⚠ {warnLabel(w.code)}</li>)}</ul>
+            )}
+            <button className="btn-primary w-full py-3 text-lg" disabled={cart.lines.length === 0 || !total} onClick={openPay}>{t("pos.pay")}</button>
+            <div className="grid grid-cols-3 gap-2">
+              <button className="btn-secondary btn-sm" onClick={hold}>{t("pos.hold")}</button>
+              <button className="btn-secondary btn-sm" onClick={() => setHeldOpen(true)}>{t("pos.heldList")} <span className="num">({held.length})</span></button>
+              <button className="btn-ghost btn-sm text-rose-700" onClick={clear}>{t("pos.clear")}</button>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-ink-100 pt-3 text-[11px] text-ink-500">
+              <span><span className="kbd">F2</span> {t("common.search")}</span><span><span className="kbd">F4</span> {t("pos.hold")}</span><span><span className="kbd">F9</span> {t("pos.pay")}</span><span><span className="kbd">Esc</span> {t("common.close")}</span>
+            </div>
           </div>
         </aside>
+      </div>
+
+      {/* Phone / tablet: pinned pay bar */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-ink-200/80 bg-white/95 p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] shadow-pop backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold text-ink-500">{t("pos.total")} · {cart.lines.length} {t("pos.item")}</div>
+            <div className="num truncate text-2xl font-extrabold leading-tight">{total ? fmtMoney(total, locale) : "—"}</div>
+          </div>
+          <button className="btn-secondary btn-icon" aria-label={t("pos.heldList")} onClick={() => setHeldOpen(true)}><span className="num text-sm font-bold">{held.length}</span></button>
+          <button className="btn-secondary btn-icon" aria-label={t("pos.hold")} onClick={hold}>⏸</button>
+          <button className="btn-primary h-12 px-6 text-base" disabled={cart.lines.length === 0 || !total} onClick={openPay}>{t("pos.pay")}</button>
+        </div>
       </div>
 
       {paying && total && (
