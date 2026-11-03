@@ -11,12 +11,13 @@ import { PurchasingModule } from "./purchasing/purchasing.module.js";
 import { TreasuryModule } from "./treasury/treasury.module.js";
 import { ReportsModule } from "./reports/reports.module.js";
 import { SystemModule } from "./system/system.module.js";
+import { ImportModule } from "./import/import.module.js";
 import { ApiExceptionFilter } from "./shared/http-exception.filter.js";
 import { HealthController } from "./health.controller.js";
 
 export function buildAppModule(cfg: AppConfig = loadConfig()) {
   @Module({
-    imports: [DbModule.forRoot(cfg), IdentityModule, CatalogModule, InventoryModule, SalesModule, CustomersModule, PurchasingModule, TreasuryModule, ReportsModule, SystemModule],
+    imports: [DbModule.forRoot(cfg), IdentityModule, CatalogModule, InventoryModule, SalesModule, CustomersModule, PurchasingModule, TreasuryModule, ReportsModule, SystemModule, ImportModule],
     controllers: [HealthController],
     providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],
   })
