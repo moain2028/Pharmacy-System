@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ApiError, get } from "@/lib/api";
 import { useAuth, type Me } from "@/lib/auth";
+import { usePrefs, type Theme, type Digits, type Density } from "@/lib/prefs";
 import { ErrorBox, PageHeader, Spinner, toast } from "@/components/ui";
 import { useFeatureT } from "@/features/users/featureT";
 import { settingsAr, settingsEn } from "./settings.keys";
@@ -21,6 +22,12 @@ function download(data: unknown) {
 export default function SettingsPage() {
   const { t, locale } = useFeatureT(settingsAr, settingsEn);
   const setLocale = useAuth((s) => s.setLocale);
+  const prefs = usePrefs();
+  const Seg = <V extends string>({ id, value, options, onChange }: { id: string; value: V; options: Array<[V, string]>; onChange: (v: V) => void }) => (
+    <div className="inline-flex flex-wrap gap-1 rounded-lg bg-ink-100 p-1" role="radiogroup" aria-labelledby={id}>
+      {options.map(([v, label]) => <button key={v} type="button" role="radio" aria-checked={value === v} onClick={() => onChange(v)} className={`min-h-[2.25rem] rounded-md px-3 text-sm font-medium transition ${value === v ? "bg-white text-brand-800 shadow-card" : "text-ink-600 hover:text-ink-900"}`}>{label}</button>)}
+    </div>
+  );
   const me = useQuery({ queryKey: ["auth", "me"], queryFn: () => get<Me>("/auth/me") });
   const [unavailable, setUnavailable] = useState(false);
   const backup = useMutation({
@@ -44,13 +51,19 @@ export default function SettingsPage() {
           </tbody></table>
         )}
       </section>
-      <section className="card" aria-labelledby="set-lang">
-        <h2 id="set-lang" className="mb-2 font-semibold">{t("set.language")}</h2>
-        <div className="flex gap-2" role="radiogroup" aria-labelledby="set-lang">
-          {(["ar", "en"] as const).map((l) => (
-            <button key={l} role="radio" aria-checked={locale === l} className={locale === l ? "btn-primary" : "btn-secondary"} onClick={() => setLocale(l)}>{t(`set.lang.${l}`)}</button>
-          ))}
-        </div>
+      <section className="card" aria-labelledby="set-prefs">
+        <h2 id="set-prefs" className="mb-1 font-semibold">{t("set.prefs")}</h2>
+        <p className="mb-4 text-sm text-ink-500">{t("set.prefsDesc")}</p>
+        <dl className="grid gap-4 sm:grid-cols-[12rem_1fr] sm:items-center">
+          <dt id="set-lang" className="text-sm font-semibold text-ink-700">{t("set.language")}</dt>
+          <dd><Seg id="set-lang" value={locale} options={[["ar", t("set.lang.ar")], ["en", t("set.lang.en")]]} onChange={(l) => setLocale(l)} /></dd>
+          <dt id="set-theme" className="text-sm font-semibold text-ink-700">{t("set.theme")}</dt>
+          <dd><Seg<Theme> id="set-theme" value={prefs.theme} options={[["system", t("set.theme.system")], ["light", t("set.theme.light")], ["dark", t("set.theme.dark")]]} onChange={prefs.setTheme} /></dd>
+          <dt id="set-digits" className="text-sm font-semibold text-ink-700">{t("set.digits")}</dt>
+          <dd><Seg<Digits> id="set-digits" value={prefs.digits} options={[["latn", "0123456789"], ["arab", "٠١٢٣٤٥٦٧٨٩"]]} onChange={prefs.setDigits} /><p className="mt-1 text-xs text-ink-500">{t("set.digitsHint")}</p></dd>
+          <dt id="set-density" className="text-sm font-semibold text-ink-700">{t("set.density")}</dt>
+          <dd><Seg<Density> id="set-density" value={prefs.density} options={[["comfortable", t("set.density.comfortable")], ["compact", t("set.density.compact")]]} onChange={prefs.setDensity} /></dd>
+        </dl>
       </section>
       <section className="card" aria-labelledby="set-bk">
         <h2 id="set-bk" className="mb-2 font-semibold">{t("set.backup")}</h2>

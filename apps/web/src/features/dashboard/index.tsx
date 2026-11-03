@@ -142,11 +142,11 @@ export default function Dashboard() {
           )}
           {d.todaySales.length > 0 && (
             <>
-              <h3 className="mb-2 mt-5 text-xs font-bold uppercase tracking-wide text-ink-400">{t("dash.salesByCurrency")}</h3>
+              <h3 className="mb-2 mt-5 text-xs font-semibold text-ink-500">{t("dash.salesByCurrency")}</h3>
               <ul className="divide-y divide-ink-100">
                 {d.todaySales.map((s) => (
                   <li key={s.currency} className="flex items-center justify-between py-2 text-sm">
-                    <span className="text-ink-700">{CURRENCY_LABEL[s.currency]?.[locale] ?? s.currency} <span className="num text-xs text-ink-400">×{s.count}</span></span>
+                    <span className="text-ink-700">{CURRENCY_LABEL[s.currency]?.[locale] ?? s.currency} <span className="num text-xs text-ink-500">×{s.count}</span></span>
                     <span className="num font-semibold">{fmtMinor(s.totalMinor, s.currency, locale)}</span>
                   </li>
                 ))}

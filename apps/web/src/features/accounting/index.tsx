@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useTab } from "@/lib/useTab";
 import { PageHeader } from "@/components/ui";
 import { useAT } from "./util";
 import { CoaTab } from "./CoaTab";
@@ -9,7 +9,7 @@ type Tab = "coa" | "opening" | "rates";
 
 export default function AccountingPage() {
   const { t } = useAT();
-  const [tab, setTab] = useState<Tab>("coa");
+  const [tab, setTab] = useTab<Tab>(["coa", "opening", "rates"] as const);
   return (
     <div>
       <PageHeader title={t("acc.title")} />

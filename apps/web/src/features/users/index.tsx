@@ -1,3 +1,4 @@
+import { useTab } from "@/lib/useTab";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { get } from "@/lib/api";
@@ -9,7 +10,7 @@ import RolesTab from "./RolesTab";
 
 export default function UsersPage() {
   const { t } = useUT();
-  const [tab, setTab] = useState<"users" | "roles">("users");
+  const [tab, setTab] = useTab(["users", "roles"] as const);
   return (
     <div>
       <PageHeader title={t("users.title")} />

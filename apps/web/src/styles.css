@@ -18,7 +18,35 @@
     --topbar-h: 3.5rem;
     --bottomnav-h: 3.75rem;
     color-scheme: light;
+    /* Light neutrals (teal-tinted). Values are RGB triplets so Tailwind alpha modifiers keep working. */
+    --ink-50: 248 250 250; --ink-100: 241 244 244; --ink-200: 227 232 232; --ink-300: 203 211 212; --ink-400: 154 166 168;
+    --ink-500: 95 107 112; --ink-600: 74 85 90; --ink-700: 52 62 67; --ink-800: 31 39 43; --ink-900: 18 26 29;
+    --surface: 255 255 255; --surface-raised: 255 255 255;
   }
+  /* Dark: the ramp is inverted (ink-50 becomes the darkest canvas) so "text-ink-900 on bg-ink-50" stays readable
+     everywhere without touching components. Contrast: #E6ECED on #0E1517 = 15.5:1; muted #9FB0B4 = 8.2:1. */
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --ink-50: 14 21 23; --ink-100: 22 32 35; --ink-200: 42 56 60; --ink-300: 58 75 80; --ink-400: 110 128 133;
+    --ink-500: 159 176 180; --ink-600: 184 198 201; --ink-700: 208 218 220; --ink-800: 224 232 233; --ink-900: 230 236 237;
+    --surface: 22 32 35; --surface-raised: 29 41 44;
+  }
+  [data-theme="dark"] body { background: rgb(var(--ink-50)); }
+  [data-theme="dark"] .card, [data-theme="dark"] .card-tight, [data-theme="dark"] aside, [data-theme="dark"] header[data-topbar], [data-theme="dark"] [data-bottomnav], [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea, [data-theme="dark"] .btn-secondary { background-color: rgb(var(--surface)); }
+  [data-theme="dark"] .bg-white { background-color: rgb(var(--surface)); }
+  [data-theme="dark"] .bg-brand-50, [data-theme="dark"] .bg-brand-50\/40, [data-theme="dark"] tbody tr:hover td { background-color: rgb(17 94 89 / 0.25); }
+  [data-theme="dark"] .bg-brand-100 { background-color: rgb(17 94 89 / 0.4); }
+  [data-theme="dark"] .text-brand-700 { color: #80C9C3; }
+  [data-theme="dark"] .hover\:bg-brand-50:hover { background-color: rgb(17 94 89 / 0.25); }
+  [data-theme="dark"] .text-brand-800 { color: #80C9C3; }
+  [data-theme="dark"] .bg-amber-50 { background-color: rgb(146 64 14 / 0.2); } [data-theme="dark"] .text-amber-900, [data-theme="dark"] .text-amber-800 { color: #FDE68A; } [data-theme="dark"] .border-amber-200 { border-color: rgb(217 119 6 / 0.4); }
+  [data-theme="dark"] .bg-danger-50 { background-color: rgb(190 18 60 / 0.2); } [data-theme="dark"] .text-danger-700, [data-theme="dark"] .text-rose-700, [data-theme="dark"] .text-danger-600 { color: #FDA4AF; }
+  [data-theme="dark"] .bg-emerald-50, [data-theme="dark"] .bg-success-50 { background-color: rgb(4 120 87 / 0.2); } [data-theme="dark"] .text-emerald-800 { color: #6EE7B7; }
+  [data-theme="dark"] .shadow-card, [data-theme="dark"] .shadow-pop { box-shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -8px rgb(0 0 0 / .5); }
+  [data-theme="dark"] .skeleton { background-image: linear-gradient(90deg, rgb(var(--ink-100)) 25%, rgb(var(--ink-200)) 37%, rgb(var(--ink-100)) 63%); }
+  /* Density: compact tightens table rows and card padding on fine pointers only. */
+  [data-density="compact"] tbody td { padding-top: .375rem; padding-bottom: .375rem; }
+  [data-density="compact"] .card { padding: .75rem 1rem; }
   html { font-size: 100%; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body { @apply bg-ink-50 text-ink-900 antialiased; font-feature-settings: "kern" 1, "liga" 1; line-height: 1.55; overscroll-behavior-y: none; }
   h1, h2, h3 { @apply font-bold text-ink-900; line-height: 1.3; }

@@ -15,7 +15,8 @@ export default {
       colors: {
         // Teal brand (≈172°) paired with neutrals tinted toward the same hue — the previous blue-grey (≈220°) clashed.
         brand: { 50: "#F0F9F8", 100: "#D9F0EE", 200: "#B3E0DC", 300: "#80C9C3", 400: "#4AABA4", 500: "#238F89", 600: "#14807A", 700: "#0F766E", 800: "#115E59", 900: "#123F3C", 950: "#052B28" },
-        ink: { 50: "#F8FAFA", 100: "#F1F4F4", 200: "#E3E8E8", 300: "#CBD3D4", 400: "#9AA6A8", 500: "#5F6B70", 600: "#4A555A", 700: "#343E43", 800: "#1F272B", 900: "#121A1D" },
+        ink: { 50: "rgb(var(--ink-50) / <alpha-value>)", 100: "rgb(var(--ink-100) / <alpha-value>)", 200: "rgb(var(--ink-200) / <alpha-value>)", 300: "rgb(var(--ink-300) / <alpha-value>)", 400: "rgb(var(--ink-400) / <alpha-value>)", 500: "rgb(var(--ink-500) / <alpha-value>)", 600: "rgb(var(--ink-600) / <alpha-value>)", 700: "rgb(var(--ink-700) / <alpha-value>)", 800: "rgb(var(--ink-800) / <alpha-value>)", 900: "rgb(var(--ink-900) / <alpha-value>)" },
+        surface: { DEFAULT: "rgb(var(--surface) / <alpha-value>)", raised: "rgb(var(--surface-raised) / <alpha-value>)" },
         success: { 50: "#ECFDF5", 200: "#A7F3D0", 700: "#047857", 800: "#065F46" },
         warning: { 50: "#FFFBEB", 200: "#FDE68A", 600: "#D97706", 800: "#92400E" },
         danger: { 50: "#FFF1F2", 200: "#FECDD3", 600: "#E11D48", 700: "#BE123C" },
