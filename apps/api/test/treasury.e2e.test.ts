@@ -119,6 +119,14 @@ describe("treasury API", () => {
     expect([mv?.kind, mv?.a]).toEqual(["CUSTOMER_PAYMENT", "50000"]);
   });
 
+  it("allocated customer receipt resolves invoice ids (uuid[] binding) — unknown invoice is 404, not 500", async () => {
+    const [cust] = await sql<{ id: string }[]>`SELECT id::text FROM customers WHERE tenant_id = ${c.tenantId} AND code = 'C-001'`;
+    const r = await c.call("POST", "/customer-receipts", { customerId: cust!.id, cashboxId: reg1, method: "CASH", currency: "YER_NEW", amountMinor: "10000", businessDate: "2026-03-03",
+      allocations: [{ invoiceId: "00000000-0000-0000-0000-000000000001", amountMinor: "10000" }] });
+    expect(r.status).toBe(404);
+    expect(r.body.error.code).toBe("sales_invoice.not_found");
+  });
+
   it("posts opening balances once", async () => {
     const body = { businessDate: "2026-01-01", lines: [{ accountCode: "1400", side: "DEBIT", amountMinor: "100000000" }, { accountCode: "2100", side: "CREDIT", amountMinor: "30000000" }] };
     const r = await c.call("POST", "/accounting/opening-balances", body);

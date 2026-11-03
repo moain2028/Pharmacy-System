@@ -71,8 +71,8 @@ export class ImportService {
     // existence checks (codes / barcodes) in one query
     const codes = inputs.map((i) => i.input.itemCode).filter((c): c is string => !!c); const barcodes = inputs.map((i) => i.barcode).filter((b): b is string => !!b);
     await this.db.tx(tenantId, async (tx) => {
-      if (codes.length) for (const r of await tx<{ item_code: string }[]>`SELECT item_code FROM items WHERE item_code = ANY(${tx.array(codes)})`) errors.push({ row: inputs.findIndex((i) => i.input.itemCode === r.item_code) + 2, field: "item_code", code: "exists", message: `item_code ${r.item_code} already exists` });
-      if (barcodes.length) for (const r of await tx<{ barcode: string }[]>`SELECT barcode FROM item_barcodes WHERE barcode = ANY(${tx.array(barcodes)}) OR normalized_barcode = ANY(${tx.array(barcodes.map((b) => b.padStart(14, "0")))})`) errors.push({ row: inputs.findIndex((i) => i.barcode === r.barcode) + 2, field: "barcode", code: "exists", message: `barcode ${r.barcode} already exists` });
+      if (codes.length) for (const r of await tx<{ item_code: string }[]>`SELECT item_code FROM items WHERE item_code = ANY(${codes}::text[])`) errors.push({ row: inputs.findIndex((i) => i.input.itemCode === r.item_code) + 2, field: "item_code", code: "exists", message: `item_code ${r.item_code} already exists` });
+      if (barcodes.length) for (const r of await tx<{ barcode: string }[]>`SELECT barcode FROM item_barcodes WHERE barcode = ANY(${barcodes}::text[]) OR normalized_barcode = ANY(${barcodes.map((b) => b.padStart(14, "0"))}::text[])`) errors.push({ row: inputs.findIndex((i) => i.barcode === r.barcode) + 2, field: "barcode", code: "exists", message: `barcode ${r.barcode} already exists` });
     });
     errors.sort((a, b) => a.row - b.row);
     const result: ImportResult = { total: records.length, valid: records.length - new Set(errors.map((e) => e.row)).size, imported: 0, errors, dryRun };

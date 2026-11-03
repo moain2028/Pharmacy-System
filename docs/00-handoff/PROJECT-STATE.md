@@ -11,7 +11,7 @@
 |---|---|
 | المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~85%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
+| نسبة الإنجاز التقديرية للمرحلة | **~92%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
 | هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (89 اختبار E2E، 84 مسارًا، OpenAPI على /api/docs)، `apps/web` (أساس: عميل API، مخزن مصادقة، i18n ar/en، Shell RTL/LTR، دخول، معالج إعداد، لوحة) |
 | الفرع النشط | `genspark_ai_developer` |
 | آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
@@ -81,3 +81,10 @@
 1. Salvage + integrate remaining UI agents: E1-pos, E2a-items, E2b-inventory-expiry, E5a-reports (`python3 tools/agents/salvage.py .tmp_agents/<id>.json --write`, register keys in `apps/web/src/i18n/register-features.ts`, then tsc/eslint/vitest).
 2. Fix smoke `tools/smoke/pharmacy-day.mjs` GRN stock step; add to CI.
 3. Rebuild `apps/web/dist`, verify live POS; Windows: build Tauri installer per `apps/desktop/README.md`.
+
+
+## Next actions (after session #9)
+1. Windows machine: build Tauri installer per `apps/desktop/README.md`; run `pharmacy-day.mjs` against the installed build.
+2. UI polish pass on a real screen (RTL spacing, print CSS for 80mm receipt, mobile breakpoints for dashboard/reports).
+3. Data: seed a realistic Yemeni item catalogue via `POST /import/items` CSV; user acceptance with the first pharmacy.
+4. Verify CI smoke step on main (first run after PR #9).

@@ -24,3 +24,16 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test:coverage
+      - name: Smoke — full pharmacy day against the built API
+        env:
+          DATABASE_URL: postgres://pharmacore:pharmacore@localhost:5432/pharmacore_test
+          NODE_ENV: production
+          PORT: 3100
+          HOST: 0.0.0.0
+          AUTO_MIGRATE: "true"
+          JWT_SECRET: ci-smoke-secret-ci-smoke-secret-ci-smoke-secret-1234
+        run: |
+          psql "$DATABASE_URL" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" >/dev/null
+          (cd apps/api && node dist/main.js > /tmp/api.log 2>&1 &)
+          for i in $(seq 1 40); do curl -sf localhost:3100/api/v1/health >/dev/null && break; sleep 1; done
+          node tools/smoke/pharmacy-day.mjs http://localhost:3100 || { tail -n 80 /tmp/api.log; exit 1; }
