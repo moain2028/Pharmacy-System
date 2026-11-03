@@ -1,0 +1,19 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { post } from "@/lib/api";
+import { useT } from "@/i18n";
+import { ErrorBox, toast } from "@/components/ui";
+import { Currency, Input, Invalid, RemoteSelect, Totals } from "@/features/procurement/shared";
+import SupplierItemPicker from "@/features/purchasing/SupplierItemPicker";
+import { discount, DiscountFields, LineEditor, linePayload, newLine } from "@/features/purchasing/lines";
+import type { Draft, PurchaseLine } from "@/features/purchasing/lines";
+export interface PoResult { id: string; number: string; status: string; totals: unknown }
+export default function PoForm() {
+  const { t } = useT(); const qc = useQueryClient(); const [supplierId, setSupplier] = useState(""); const [currency, setCurrency] = useState("YER_NEW"); const [expectedDate, setDate] = useState(""); const [notes, setNotes] = useState(""); const [lines, setLines] = useState<Draft[]>([]); const [invalid, setInvalid] = useState(false); const [discountType, setDiscountType] = useState("none"); const [discountValue, setDiscountValue] = useState(""); const [approved, setApproved] = useState(false);
+  const save = useMutation({ mutationFn: (body: unknown) => post<PoResult>("/purchase-orders", body), onSuccess: r => { toast.ok(t("purchasing.saved", { number: r.number })); void qc.invalidateQueries({ queryKey: ["/purchase-orders"] }); } });
+  const approve = useMutation({ mutationFn: (id: string) => post(`/purchase-orders/${id}/approve`), onSuccess: () => { setApproved(true); void qc.invalidateQueries({ queryKey: ["/purchase-orders"] }); } });
+  if (save.data) return <section className="card space-y-3"><h2 className="num">{save.data.number}</h2><Totals value={save.data.totals} currency={currency} />{approve.error && <ErrorBox error={approve.error} />}<button className="btn-primary" disabled={approve.isPending || approved} onClick={() => approve.mutate(save.data.id)}>{t(approved ? "purchasing.approved" : "purchasing.approve")}</button><button className="btn-secondary" onClick={() => { save.reset(); approve.reset(); setLines([]); setApproved(false); }}>{t("common.new")}</button></section>;
+  return <form className="card space-y-3" noValidate onSubmit={e => { e.preventDefault(); const payload = lines.map(l => linePayload(l, currency)); const d = discount(discountType, discountValue, currency); if (!supplierId || payload.length === 0 || payload.length > 500 || payload.some(l => l === null) || d === null) { setInvalid(true); return; } setInvalid(false); save.mutate({ supplierId, currency, ...(expectedDate ? { expectedDate } : {}), ...(notes ? { notes } : {}), lines: payload.filter((l): l is PurchaseLine => l !== null), ...(d ? { invoiceDiscount: d } : {}) }); }}>
+    <fieldset disabled={save.isPending} className="space-y-3"><div className="grid gap-3 md:grid-cols-2"><RemoteSelect path="/suppliers" label="purchasing.supplier" value={supplierId} onChange={setSupplier} /><Currency value={currency} onChange={setCurrency} /><Input label="purchasing.expected" value={expectedDate} type="date" onChange={setDate} /><Input label="common.notes" value={notes} onChange={setNotes} maxLength={500} /></div><SupplierItemPicker onPick={p => setLines(v => [...v, newLine(p)])} />{lines.map(l => <LineEditor key={l.key} line={l} mode="po" onChange={next => setLines(v => v.map(x => x.key === l.key ? next : x))} onRemove={() => setLines(v => v.filter(x => x.key !== l.key))} />)}<h3>{t("purchasing.invoiceDiscount")}</h3><DiscountFields type={discountType} value={discountValue} onChange={(type, value) => { setDiscountType(type); setDiscountValue(value); }} /><Invalid show={invalid} />{save.error && <ErrorBox error={save.error} />}<button type="submit" className="btn-primary" disabled={save.isPending}>{t("common.save")}</button></fieldset>
+  </form>;
+}

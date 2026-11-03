@@ -95,9 +95,14 @@ export class CustomersService {
   }
 
   async create(tenantId: string, actor: CustomerActor, body: CustomerCreate): Promise<unknown> {
+    return this.db.tx(tenantId, (tx) => this.createIn(tx, tenantId, actor, body));
+  }
+
+  /** Transaction-scoped create (CSV import batches). */
+  async createIn(tx: Sql, tenantId: string, actor: CustomerActor, body: CustomerCreate): Promise<unknown> {
     const limit = BigInt(body.creditLimitMinor ?? "0");
     if (limit > 0n && !actor.permissions.has(CREDIT_PERM)) throw creditDenied();
-    return this.db.tx(tenantId, async (tx) => {
+    {
       let code = body.code;
       if (code === undefined) {
         const [r] = await tx<{ n: string }[]>`SELECT GREATEST(count(*), COALESCE(MAX(substring(code from '^C-([0-9]+)$')::bigint), 0))::text AS n FROM customers`;
@@ -110,7 +115,7 @@ export class CustomersService {
       await tx`INSERT INTO audit_log (tenant_id, actor_user_id, action, entity_type, entity_id, after_data)
         VALUES (${tenantId}, ${actor.userId}, 'customers.create', 'customer', ${row.id}, ${tx.json(J(row))})`;
       return J(row);
-    });
+    }
   }
 
   async update(tenantId: string, actor: CustomerActor, id: string, body: CustomerPatch): Promise<unknown> {

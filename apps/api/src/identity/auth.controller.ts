@@ -33,7 +33,8 @@ export class AuthController {
 
   @Get("me")
   me(@CurrentUser() me: Principal) {
-    return { id: me.userId, tenantId: me.tenantId, username: me.username, locale: me.locale, permissions: [...me.access.permissions].sort() };
+    // `id` kept for backward compatibility; the web client reads `userId`/`displayName`.
+    return { id: me.userId, userId: me.userId, tenantId: me.tenantId, username: me.username, displayName: me.displayName, locale: me.locale, permissions: [...me.access.permissions].sort() };
   }
 
   @Public() @Get("permissions")

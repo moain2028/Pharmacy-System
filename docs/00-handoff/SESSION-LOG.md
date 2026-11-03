@@ -100,3 +100,16 @@
 **أخطاء الوكلاء التي اكتشفتها المراجعة (للعبرة):** `isActive` بدل `active` مخفي بـ `as unknown as`؛ حركات FX بلا rate snapshot؛ `Money.eq` غير موجود؛ تمرير خصم صفري لقاعدة ترحيل ترفض الصفر؛ اختبارات تقرأ `body.code` بدل `body.error.code`؛ `roleCodes` بدل `roleIds` (خطأ في تعليماتي أنا). أيضًا `dist/` القديم لحزمة domain سبّب أخطاء وهمية — **أعد بناء domain قبل فحص API**.
 **PR:** #6.
 **التالي:** PROJECT-STATE §2 (دمج E1–E5 → تشغيل حي → desktop).
+
+---
+
+## Session #7 — 2026-11-03 — تكملة في نفس الجلسة: E4 مدمج، CSV، Backup، Desktop، Smoke (PR #7)
+**الطلب:** "أكمل المشروع بالكامل… ادمج وارفع واحفظ كل شيء في GitHub… لا تتوقف."
+**ما تم:**
+- **E4 (Astra)** دُمج أول مرة بلا أخطاء: 33 ملفًا (موردون، أوامر شراء، استلام، فواتير موردين بمطابقة ثلاثية، مرتجعات شراء، مدفوعات، صندوق، مصروفات) + 9 اختبارات.
+- API: `STATIC_DIR` يخدم SPA مع fallback (تم التحقق حيًا: `/pos`→HTML، `/api/*`→JSON 404)، Backup (pg_dump/sha256/verify/download/restore/prune)، OpenAPI `/api/docs`، **CSV import/export** (أصناف بسلّم وحدات+باركود+سعر، عملاء، موردون؛ dry-run بأخطاء صفّية؛ كل-أو-لا-شيء) مع `createIn/addBarcodeIn` كنوى معاملاتية. `/auth/me` يُرجع الآن `userId/displayName`. **94 E2E.**
+- Desktop: Tauri 2 shell (tray، انتظار health، إخفاء للـ tray)، `build-sea.mjs`، `fetch-postgres.mjs`، `install-services.ps1` (initdb، pg_ctl register، WinSW، جدار ناري، مهمة نسخ ليلي)، `uninstall-services.ps1`، NSIS hooks، أيقونات، README؛ typecheck/lint/test خضراء.
+- `tools/smoke/pharmacy-day.mjs`: سيناريو يوم كامل ضد خادم حي — نجح حتى GRN؛ الخطوة التالية مفتوحة (PROJECT-STATE §2 بند 2).
+- وكلاء الويب الكبار تعطّلوا (بث متوقف 27 دقيقة) → أُعيد إطلاقهم كسبع مهام أصغر؛ قيد التشغيل عند الإغلاق.
+- حادثة: توكن التطبيق فقد صلاحية الدفع؛ استُخدم توكن المالك. **يجب إلغاؤه.**
+**PR:** #7.

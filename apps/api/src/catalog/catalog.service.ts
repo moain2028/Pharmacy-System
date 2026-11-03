@@ -64,9 +64,14 @@ export class CatalogService {
   }
 
   async create(tenantId: string, actorId: string, input: ItemInput): Promise<{ id: string; itemCode: string }> {
+    return this.db.tx(tenantId, (tx) => this.createIn(tx, tenantId, actorId, input));
+  }
+
+  /** Transaction-scoped create (used by CSV import to batch many items atomically). */
+  async createIn(tx: Sql, tenantId: string, actorId: string, input: ItemInput): Promise<{ id: string; itemCode: string }> {
     const v = validateUnitLadder(ladder(input.units, "new"));
     if (isErr(v)) throw v.error;
-    return this.db.tx(tenantId, async (tx) => {
+    {
       const code = input.itemCode?.trim() || (await this.nextItemCode(tx, tenantId));
       const [it] = await tx<{ id: string }[]>`INSERT INTO items (tenant_id, item_code, trade_name_ar, trade_name_en, generic_name, strength, dosage_form, manufacturer, agent_name, country_of_origin, category_id,
           rx_required, controlled_class, track_expiry, requires_cold_chain, is_returnable, tax_bp, min_stock_ssu, max_stock_ssu, reorder_point_ssu, notes)
@@ -78,7 +83,7 @@ export class CatalogService {
       }
       await tx`INSERT INTO audit_log (tenant_id, actor_user_id, action, entity_type, entity_id, after_data) VALUES (${tenantId}, ${actorId}, 'items.create', 'item', ${it!.id}, ${tx.json(JSON.parse(JSON.stringify(input)))})`;
       return { id: it!.id, itemCode: code };
-    });
+    }
   }
 
   async update(tenantId: string, actorId: string, itemId: string, input: ItemInput & { isActive?: boolean | undefined; version: number }) {
@@ -122,7 +127,12 @@ export class CatalogService {
 
   // ---------------------------------------------------------------- barcodes
   async addBarcode(tenantId: string, actorId: string, itemId: string, input: { barcode?: string | undefined; unitId: string; isPrimary: boolean; generateInternal: boolean }) {
-    return this.db.tx(tenantId, async (tx) => {
+    return this.db.tx(tenantId, (tx) => this.addBarcodeIn(tx, tenantId, actorId, itemId, input));
+  }
+
+  /** Transaction-scoped barcode add (normalisation + duplicate check in one place; used by CSV import). */
+  async addBarcodeIn(tx: Sql, tenantId: string, actorId: string, itemId: string, input: { barcode?: string | undefined; unitId: string; isPrimary: boolean; generateInternal: boolean }) {
+    {
       let raw = input.barcode?.trim() ?? "";
       let type: BarcodeType;
       let normalized: string;
@@ -142,7 +152,7 @@ export class CatalogService {
         VALUES (${tenantId}, ${itemId}, ${input.unitId}, ${raw}, ${normalized}, ${type}, ${source}, ${input.isPrimary}) RETURNING id`;
       await tx`INSERT INTO audit_log (tenant_id, actor_user_id, action, entity_type, entity_id, after_data) VALUES (${tenantId}, ${actorId}, 'barcodes.add', 'item', ${itemId}, ${tx.json({ barcode: raw, type, unitId: input.unitId })})`;
       return { id: b!.id, barcode: raw, type, normalized };
-    });
+    }
   }
 
   // ---------------------------------------------------------------- prices

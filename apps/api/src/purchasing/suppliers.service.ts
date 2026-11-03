@@ -50,7 +50,12 @@ export class SuppliersService {
   }
 
   create(tenantId: string, actorId: string, p: SupplierIn) {
-    return this.db.tx(tenantId, async (tx) => {
+    return this.db.tx(tenantId, (tx) => this.createIn(tx, tenantId, actorId, p));
+  }
+
+  /** Transaction-scoped create (CSV import batches). */
+  async createIn(tx: Sql, tenantId: string, actorId: string, p: SupplierIn) {
+    {
       const [cnt] = await tx<{ c: number }[]>`SELECT count(*)::int AS c FROM suppliers WHERE tenant_id = ${tenantId}`;
       const code = p.code ?? `S-${(cnt?.c ?? 0) + 1}`;
       const [row] = await tx<SupplierRow[]>`INSERT INTO suppliers (tenant_id, code, name, phone, address, tax_number, default_currency, payment_terms_days, early_payment_days, early_payment_bp)
@@ -58,7 +63,7 @@ export class SuppliersService {
         RETURNING *`;
       await audit(tx, tenantId, actorId, "supplier.create", row!.id, null, row);
       return J(row);
-    });
+    }
   }
 
   patch(tenantId: string, actorId: string, id: string, p: SupplierPatchIn) {

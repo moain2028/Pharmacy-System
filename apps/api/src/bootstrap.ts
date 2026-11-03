@@ -2,6 +2,8 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, type NestFastifyApplication } from "@nestjs/platform-fastify";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { buildAppModule } from "./app.module.js";
 import type { AppConfig } from "./infra/config.js";
 
@@ -24,6 +26,21 @@ export async function createApp(cfg: AppConfig): Promise<NestFastifyApplication>
       .setTitle("PharmaCore API").setVersion("1").setDescription("Pharmacy management API — Arabic/English error envelope `{ error: { code, message, messageEn, details? }, requestId }`. Money = minor-unit strings; quantities in SSU.")
       .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }).addServer("/").build());
     SwaggerModule.setup("api/docs", app, doc, { jsonDocumentUrl: "api/docs.json", swaggerOptions: { persistAuthorization: true } });
+  }
+  if (cfg.STATIC_DIR && existsSync(cfg.STATIC_DIR)) {
+    // Desktop/single-process mode: serve the SPA. Nest owns the global 404 handler, so the SPA fallback is a
+    // wildcard route — static API routes always take precedence over `/*` in Fastify's router.
+    const root = resolve(cfg.STATIC_DIR);
+    const fastifyStatic = (await import("@fastify/static")).default;
+    const f = adapter.getInstance();
+    await f.register(fastifyStatic, { root, prefix: "/", wildcard: false, decorateReply: true, cacheControl: true, maxAge: "1h" });
+    f.get("/*", (req, reply) => {
+      const path = (req.raw.url ?? "/").split("?")[0] ?? "/";
+      if (path.startsWith("/api/") || /\.[a-zA-Z0-9]{1,8}$/.test(path)) {
+        return reply.status(404).send({ error: { code: "http.not_found", message: "غير موجود", messageEn: "Not found" }, requestId: req.id });
+      }
+      return reply.header("Cache-Control", "no-store").sendFile("index.html");
+    });
   }
   app.enableShutdownHooks();
   return app;

@@ -1,0 +1,21 @@
+{
+  "name": "@pharmacore/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sea": "node scripts/build-sea.mjs",
+    "fetch:pg": "node scripts/fetch-postgres.mjs",
+    "tauri": "tauri",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint scripts --max-warnings=0",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
