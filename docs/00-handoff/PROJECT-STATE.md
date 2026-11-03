@@ -1,107 +1,96 @@
 # PROJECT-STATE — الحالة الحالية للمشروع (المصدر الوحيد للحقيقة)
 
-> **آخر تحديث:** 2026-11-03 — نهاية الجلسة #4 (أول دفعة كود للمرحلة 2)
-> **من يحدّث هذا الملف:** أي وكيل/مطور في نهاية كل جلسة.
-> **قاعدة:** إذا تعارض هذا الملف مع أي ملف آخر، هذا الملف هو المرجع للحالة الحالية.
+> **آخر تحديث:** 2026-11-03 — نهاية الجلسة #13 (PR #13 مدموج في `main`)
+> **من يحدّث هذا الملف:** أي وكيل/مطور في نهاية كل جلسة. إذا تعارض مع أي ملف آخر، هذا هو المرجع.
+> **وكيل جديد؟** اقرأ `AGENTS.md` → هذا الملف → `SESSION-LOG.md` (آخر جلسة) → `docs/03-design/DESIGN-SYSTEM.md` إن كنت ستلمس الواجهة.
 
 ---
+
+## 0. الملخص التنفيذي (30 ثانية)
+PharmaCore نظام إدارة صيدليات مؤسسي (عربي/إنجليزي، 4 عملات، FEFO، قيد مزدوج). **الكود مكتمل وظيفيًا ومختبر ومدموج في `main`**: domain (919 اختبار) + db (62 جدولًا، RLS) + API (98 E2E، 84+ مسارًا، OpenAPI) + web (16 وحدة، نظام تصميم موثّق، فاتح/داكن، تدقيق 51/51 × ثيمين) + desktop (Tauri 2 جاهز للبناء على ويندوز). **اختبار "يوم صيدلية كامل" يمر من البداية للنهاية ويعمل في CI.** المتبقي الجوهري: **بناء مثبّت Windows على جهاز Windows** + **قبول المستخدم على شاشة حقيقية**.
 
 ## 1. المرحلة الحالية
 | البند | القيمة |
 |---|---|
-| المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
-| الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~98%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
-| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (89 اختبار E2E، 84 مسارًا، OpenAPI على /api/docs)، `apps/web` (أساس: عميل API، مخزن مصادقة، i18n ar/en، Shell RTL/LTR، دخول، معالج إعداد، لوحة) |
-| الفرع النشط | `genspark_ai_developer` |
-| آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
+| المرحلة | **Phase 2/3/4 مُنجزة كودًا** (Foundation + MVP modules + Purchasing/Accounting/Reporting) — **Phase 5 (Desktop installer) جاهز للبناء** — Phase 6 (UAT) لم تبدأ |
+| نسبة الإنجاز التقديرية | **~98%** من نطاق الإصدار v0.1.0 |
+| الفرع النشط | `genspark_ai_developer` → PR إلى `main` (كل PRs حتى **#13 مدموجة**) |
+| CI | `.github/workflows/ci.yml` — build/typecheck/lint/test:coverage + **smoke يوم كامل ضد API مبني**. آخر حالة معروفة على main: ✅ (بعد PR #10) |
+| تشغيل حي للتجربة | `DEMO_MODE=true` → دخول سريع **1/1 (مالك)** و **2/2 (كاشير)**. بيانات تجريبية: `node tools/seed/demo-pharmacy.mjs <url>` |
 
-## 2. المهمة التالية بالضبط (Next Action)
-> **ابدأ من هنا إذا كنت وكيلاً جديداً.** اقرأ `AGENTS.md` ثم هذا الملف ثم `SESSION-LOG.md` (#4).
-
-**ما تم (Session #4 — PR #3):**
-- Monorepo pnpm+Turbo، TS strict، eslint؛ CI workflow في `ci/github/ci.yml` (**يحتاج المالك نقله إلى `.github/workflows/`** لأن توكن التطبيق لا يملك صلاحية workflows).
-- `packages/domain` (نقي، بلا I/O): kernel (Result/Money/Currency/Quantity) + fx + pricing/discount + inventory (Lot/FEFO/StockMovement/expiry/bonus) + accounting (CoA/JournalEntry/posting rules) + iam + audit + sales (SalesInvoice/totals/guards/payment/return) + cash (CashMovement/Cashbox/Shift) + purchasing (PurchaseOrder/GoodsReceipt). **919 اختبار، 99.67% statements / 98.06% branches** (العتبات 99/97). أُضيفت: supplier-invoice (مطابقة ثلاثية)، purchase-return، supplier-ledger، posting-rules-treasury.
-- `packages/db`: `migrations/0001_foundation.sql` (62 جدولاً، triggers P0001..P0010، RLS FORCE، دور `pharmacore_app`)، runner بالـ checksum، `withTenant()`، 35 اختباراً تُثبت رفض كل مخالفة.
-- `apps/api` NestJS/Fastify: Identity (Argon2id، JWT + refresh دوّار مع كشف إعادة الاستخدام، قفل بعد 5 محاولات، صلاحيات `resource.action` + overrides، معالج الإعداد الأولي)، Catalog (أصناف + سلّم وحدات مرن + باركود GS1 + أسعار + سعر رسمي + أسعار صرف)، Inventory (استلام، أرصدة، FEFO preview، حالات الدفعات، تسويات، تحويلات، كاردكس، worklist الانتهاء). **36 اختبار E2E** على PostgreSQL حقيقي.
-
-**المهمة التالية بالضبط (بالترتيب):**
-1. **دمج مخرجات وكلاء الواجهة** — الدفعة الأولى (E1–E5 الكبيرة) **تعطّلت بعد 27 دقيقة** (بث متوقف) فقُتلت وأُعيد إطلاقها كسبع مهام أصغر (`.tmp_agents/jobs_web2.json` → `E1-pos`, `E2a-items`, `E2b-inventory-expiry`, `E3a-sales-returns`, `E3b-customers`, `E5a-reports`, `E5b-accounting-users-settings`؛ السجل `.tmp_agents/run_web2.log`). E4 نجح ودُمج. لكل ملف ناتج: `python3 tools/agents/salvage.py <json> --write --root .` → `cd apps/web && pnpm exec tsc --noEmit && pnpm exec eslint src --max-warnings=0 && pnpm exec vitest run` (اختبار `keys-parity` يفرض تطابق قواميس i18n). إن لم تُنتج مهمة مخرجًا، أعد تشغيلها منفردة بـ `max_tokens` ≤ 16000.
-2. **إكمال `tools/smoke/pharmacy-day.mjs`** (يوم كامل في الصيدلية ضد خادم حي؛ يعمل حتى خطوة GRN). الخطوة التالية تفشل لأن `GET /inventory/items/:id/balances` يُرجع شكلاً غير المتوقع بعد GRN المرتبط بأمر شراء — تحقق هل GRN يكتب `stock_movements` بالفعل عند التمرير عبر PO (افحص `purchasing.service.ts` → `receive`)؛ أكمل بقية الخطوات حتى `✅ pharmacy-day smoke passed` ثم أضفه لـ CI كخطوة اختيارية.
-3. **تشغيل حي**: `/tmp/run_api.sh` نمط التشغيل (NODE_ENV=production, STATIC_DIR=apps/web/dist, ENABLE_DOCS=true) — الـ API يخدم SPA على `/` و docs على `/api/docs`؛ تحقق من POS كاملًا بلوحة المفاتيح بعد دمج E1.
-4. **desktop**: على جهاز ويندوز: `pnpm -w build` → `pnpm --filter @pharmacore/desktop sea` → `fetch:pg` → `tauri build` (يتطلب Rust + NSIS). راجع `apps/desktop/README.md`. ملاحظة: `build-sea.mjs` يحتاج `postject` (`npm i -g postject`).
-5. تجربة في الصيدلية → تصحيحات → وسم v0.1.0.
-
-## 3. خارطة المراحل الكلية
-| # | المرحلة | الحالة | المخرجات الرئيسية |
+## 2. ماذا أُنجز (حسب الطبقة)
+| الطبقة | المسار | الحالة | الأدلة |
 |---|---|---|---|
-| 0 | تأكيد المتطلبات مع العميل | ⏳ لم تبدأ (بانتظار جلسة مع صاحب الصيدلية) | استبيان مُجاب + SRS موقّع |
-| 1 | البحث والتحليل والتصميم | ✅ مكتملة ومعتمدة (D-023..D-031) | docs/01 → docs/10 + `docs/02-requirements/detailed/` (7 وثائق) + فيديو v2 |
-| 2 | تأسيس Monorepo + البنية التحتية | ⏳ | apps/api, apps/web, packages/domain, Prisma schema, CI |
-| 3 | MVP Modules: Identity → Catalog → Inventory → Sales (POS) | ⏳ | وحدات تعمل + اختبارات |
-| 4 | Purchasing → Accounting → Stocktake → Reporting | ⏳ | وحدات تعمل + اختبارات |
-| 5 | Licensing + Backup + Desktop (Tauri) + Installer | ⏳ | .exe + ترخيص |
-| 6 | UAT مع العميل + تدريب + تسليم | ⏳ | دليل مستخدم + عقد صيانة |
-| 7 | الإصدار العام (Multi-tenant SaaS + Sync + Mobile) | ⏳ | باقات |
+| Domain (نقي) | `packages/domain` | ✅ | 919 اختبار، تغطية 99.67%؛ Money bigint، FEFO، قيود ترحيل، مطابقة ثلاثية، مرتجعات، ورديات |
+| DB | `packages/db` | ✅ | `migrations/0001_foundation.sql` (62 جدولًا، triggers P0001..P0010، RLS FORCE)، 35 اختبار ثوابت |
+| API | `apps/api` | ✅ | NestJS/Fastify؛ Identity/Catalog/Inventory/Sales/Returns/Customers/Purchasing/Payables/Treasury/Reports/Backup/Import/DEMO؛ **98 E2E** على PostgreSQL حقيقي؛ OpenAPI `/api/docs`؛ يخدم SPA في وضع أحادي العملية |
+| Web | `apps/web` | ✅ | React 18 + Tailwind؛ **16/16 وحدة** حقيقية (POS، مبيعات، مرتجعات، عملاء، أصناف، مخزون، صلاحية، مشتريات، موردون، ذمم، صندوق، مصروفات، تقارير، محاسبة، مستخدمون، إعدادات)؛ 44 اختبار؛ نظام تصميم + 3 مراجعات خبراء مطبّقة؛ قائمة هرمية قابلة للطي؛ breadcrumbs؛ اختصارات؛ ثيم داكن؛ تفضيلات؛ طباعة A4 + 80mm |
+| Desktop | `apps/desktop` | 🟡 جاهز للبناء | Tauri 2 shell، Node SEA sidecar، PostgreSQL محمول، WinSW، NSIS hooks؛ **لم يُبنَ بعد (يحتاج Windows)** |
+| أدوات | `tools/` | ✅ | `smoke/pharmacy-day.mjs` (يوم كامل)، `seed/demo-pharmacy.mjs`، `ui-audit/{crawl,print,contrast}.mjs`، `agents/` (تشغيل وكلاء) |
+| وثائق | `docs/` | ✅ | بحث/متطلبات/DDD/معمارية/ADRs/أمن/جودة/تسليم/أعمال + `03-design` (نظام التصميم + المراجعات) + `00-handoff` |
 
-## 4. القرارات المعتمدة (ملخص — التفاصيل في DECISIONS-LOG و ADRs)
-- المنتج **عام Multi-tenant** من اليوم الأول، يُفعَّل للعميل الأول كـ Single-tenant محلي.
-- **Modular Monolith + Hexagonal Architecture + DDD**.
-- Stack مقترح (بانتظار ADR نهائي): TypeScript end-to-end — NestJS + Prisma + PostgreSQL (خادم) / React + Vite + Tailwind (ويب) / Tauri (ديسكتوب).
-- قواعد هندسية غير قابلة للتفاوض: NUMERIC للأموال، Immutable Ledger، Lots + FEFO، لا تعديل بعد الترحيل، قيد مزدوج، Audit Trail، Offline-first.
-
-## 5. الأسئلة المفتوحة (Open Questions)
-| # | السؤال | المالك | الحالة |
+## 3. ما بقي بالضبط (مرتّب)
+| # | المهمة | من | التفاصيل |
 |---|---|---|---|
-| Q1 | هل العميل يبيع بالحبة/الشريط/العلبة؟ (يحدد هرمية الوحدات) | معين → العميل | مفتوح |
-| Q2 | هل يحتاج بيع آجل (دين عملاء)؟ | معين → العميل | مفتوح |
-| Q3 | عملة واحدة (YER) أم مع SAR/USD؟ | معين → العميل | مفتوح |
-| Q4 | عدد المستخدمين/الأجهزة في الصيدلية؟ | معين → العميل | مفتوح |
-| Q5 | هل عنده قائمة أصناف جاهزة (Excel/برنامج قديم) للاستيراد؟ | معين → العميل | مفتوح |
-| Q6 | طابعة فواتير حرارية موجودة؟ قارئ باركود؟ | معين → العميل | مفتوح |
-| Q7 | هل الأدوية "المهرّبة" تُسجل بسعر مختلف لنفس الصنف؟ (ملاحظة منصور) | معين → العميل | مفتوح |
-| Q8 | اسم المؤسسة النهائي | الفريق | مفتوح (ميل: وميض تك / WamedX) |
-| Q9 | السعر النهائي للعميل الأول | الفريق | مفتوح (مقترح: 300–350$ ملكية أو اشتراك) |
+| 1 | **بناء مثبّت Windows** | يحتاج جهاز Windows (Rust + MSVC + NSIS) | `apps/desktop/README.md`: `pnpm -w build` → `pnpm --filter @pharmacore/desktop sea` → `fetch:pg` → `tauri build`. ثم شغّل `node tools/smoke/pharmacy-day.mjs http://localhost:<port>` ضد المثبَّت |
+| 2 | **قبول المستخدم على شاشة حقيقية** | المالك + الصيدلية | طابعة 80mm، قارئ باركود، هاتف فعلي. أي ملاحظة → لقطة → تُحلَّل بنفس منهج الجلسة #12 |
+| 3 | جداول الجوال كبطاقات | وكيل | طبّق `.table-stack` + `data-th` على قوائم الأصناف/المبيعات/العملاء (CSS جاهز في `styles.css`) |
+| 4 | كتالوج الصيدلية الحقيقي | المالك → `POST /import/items` CSV | القالب: `GET /import/templates/items` |
+| 5 | تأكيد المتطلبات المفتوحة Q1–Q9 (أدناه) | المالك مع العميل | معظمها مُفترض بالفعل في الكود (وحدات مرنة، آجل، 4 عملات) — التأكيد لا يغيّر البنية |
+| 6 | إصدار `v0.1.0` + وسم | بعد 1 و 2 | |
 
-## 6. المخاطر النشطة (أعلى 5 — السجل الكامل في docs/10-business/RISK-REGISTER.md)
-1. بناء بدون متطلبات مؤكدة من العميل → افتراضات خاطئة.
-2. الرغبة في "إنجاز كل شيء في ليلة" → كود بدون هيكل يناقض هدف المؤسسة.
-3. تعدد الآراء بدون مرجع واحد → تضارب.
-4. السعر منخفض مقارنة بالجهد → خسارة؛ أو مرتفع → هروب العميل.
-5. الكهرباء/الإنترنت غير مستقر في اليمن → يجب Offline-first + نسخ احتياطي.
+## 4. كيف تُشغّل كل شيء محليًا (للوكيل الجديد)
+```bash
+pnpm install --frozen-lockfile && pnpm build
+# قاعدة بيانات: PostgreSQL 16/17 بمستخدم pharmacore/pharmacore، قاعدتان: pharmacore_dev و pharmacore_test
+pnpm typecheck && pnpm lint && pnpm test            # domain 919 · db 35 · api 98 · web 44 · desktop 3
+# تشغيل حي (API يخدم الواجهة المبنية):
+cd apps/api && NODE_ENV=production PORT=3100 HOST=0.0.0.0 ENABLE_DOCS=true DEMO_MODE=true \
+  DATABASE_URL=postgres://pharmacore:pharmacore@localhost:5432/pharmacore_dev \
+  JWT_SECRET=<32+ chars> STATIC_DIR=$PWD/../web/dist BACKUP_DIR=/tmp/pc-backups node dist/main.js
+node tools/seed/demo-pharmacy.mjs http://localhost:3100      # بيانات واقعية (idempotent)
+node tools/smoke/pharmacy-day.mjs http://localhost:3100      # يجب أن ينتهي بـ ✅
+# تدقيق الواجهة (يحتاج playwright + chromium):
+node tools/ui-audit/crawl.mjs && THEME=dark node tools/ui-audit/crawl.mjs   # يجب ALL CLEAN مرتين
+node tools/ui-audit/print.mjs                                                # PDF تقرير A4
+```
+**ملاحظات تشغيل مهمة:** الـ API يحلّ `@pharmacore/domain` من `dist/` → أعد بناء domain قبل اختبارات API. في هذا الصندوق `fuser -k 3100/tcp` لا يرى الخادم؛ استخدم `ss -ltnp | grep 3100` ثم `kill -9 <pid>`.
 
-## 7. روابط سريعة
-- المستودع: https://github.com/moain2028/Pharmacy-System
-- تحليل محادثات الفريق: `docs/00-handoff/TEAM-CHAT-ANALYSIS.md`
-- سجل القرارات: `docs/00-handoff/DECISIONS-LOG.md`
-- سجل الجلسات: `docs/00-handoff/SESSION-LOG.md`
+## 5. قواعد غير قابلة للتفاوض (مختصر — التفاصيل `docs/04-architecture/ENGINEERING-RULES.md`)
+أموال bigint/NUMERIC فقط · مخزون = سجل حركات غير قابل للتعديل بأصغر وحدة · دفعات + FEFO · المرحّل لا يُعدّل (عكس/مرتجع فقط) · قيد مزدوج لكل حدث مالي · `tenant_id` + RLS في كل جدول · Audit Trail · Offline-first · **الواجهة:** لا خطوط/أيقونات من الشبكة، تباين AA، أهداف لمس 48px على اللمس، لا `transform` على حاويات عناصر `fixed`، كل تغيير في الـ shell يمر بـ `tools/ui-audit` (فاتح + داكن).
 
+## 6. الأسئلة المفتوحة مع العميل (لا تعطّل البناء — الكود يدعم كل الاحتمالات)
+| # | السؤال | الحالة |
+|---|---|---|
+| Q1 | بيع بالحبة/الشريط/العلبة؟ | مدعوم (سلّم وحدات مرن) — تأكيد فقط |
+| Q2 | بيع آجل؟ | مدعوم (سقف ائتمان + قبض + تخصيص) |
+| Q3 | عملات SAR/USD؟ | مدعوم (4 عملات + أسعار صرف) |
+| Q4 | عدد المستخدمين/الأجهزة؟ | مدعوم (أدوار + LAN) — يؤثر على الترخيص فقط |
+| Q5 | قائمة أصناف جاهزة؟ | أداة استيراد CSV جاهزة |
+| Q6 | طابعة حرارية/قارئ باركود؟ | CSS إيصال 80mm + مسح GS1/EAN جاهزان — يحتاج اختبارًا فعليًا |
+| Q7 | سعر مختلف لنفس الصنف (مهرّب)؟ | مدعوم عبر سعر رسمي + تجاوز بصلاحية |
+| Q8 | اسم المؤسسة | مفتوح |
+| Q9 | السعر النهائي | مفتوح (P-003) |
 
-## Next actions (after session #8)
-1. Salvage + integrate remaining UI agents: E1-pos, E2a-items, E2b-inventory-expiry, E5a-reports (`python3 tools/agents/salvage.py .tmp_agents/<id>.json --write`, register keys in `apps/web/src/i18n/register-features.ts`, then tsc/eslint/vitest).
-2. Fix smoke `tools/smoke/pharmacy-day.mjs` GRN stock step; add to CI.
-3. Rebuild `apps/web/dist`, verify live POS; Windows: build Tauri installer per `apps/desktop/README.md`.
+## 7. المخاطر النشطة
+1. المثبّت لم يُبنَ على Windows بعد → قد تظهر مشاكل بيئة (PostgreSQL محمول، WinSW). **أعلى أولوية.**
+2. لم يُختبر على طابعة حرارية/قارئ حقيقيين.
+3. توكن GitHub الشخصي ظهر في محادثة سابقة → **يجب إلغاؤه** (الـ remote في المستودع بدون توكن).
+4. الكهرباء/الإنترنت → Offline-first مُطبّق، النسخ الاحتياطي مُطبّق ومختبر (sha256).
 
+## 8. خريطة المراحل
+| # | المرحلة | الحالة |
+|---|---|---|
+| 0 | تأكيد المتطلبات مع العميل | ⏳ (الكود لا ينتظرها) |
+| 1 | البحث والتحليل والتصميم | ✅ |
+| 2 | Monorepo + domain + db + api | ✅ |
+| 3 | Identity → Catalog → Inventory → POS | ✅ |
+| 4 | Purchasing → Accounting → Reporting | ✅ |
+| 5 | Backup ✅ + Desktop (Tauri) 🟡 + Installer ⏳ (Windows) | 🟡 |
+| 6 | UAT + تدريب + تسليم | ⏳ |
+| 7 | SaaS متعدد المستأجرين + مزامنة + موبايل | ⏳ (البنية جاهزة: tenant_id + RLS من اليوم الأول) |
 
-## Next actions (after session #9)
-1. Windows machine: build Tauri installer per `apps/desktop/README.md`; run `pharmacy-day.mjs` against the installed build.
-2. UI polish pass on a real screen (RTL spacing, print CSS for 80mm receipt, mobile breakpoints for dashboard/reports).
-3. Data: seed a realistic Yemeni item catalogue via `POST /import/items` CSV; user acceptance with the first pharmacy.
-4. Verify CI smoke step on main (first run after PR #9).
-
-## Demo / trial login (session #10)
-- Set `DEMO_MODE=true` on the API → users `1`/`1` (owner) and `2`/`2` (cashier) exist and the login page shows quick-login buttons. **Never set on a real pharmacy.**
-
-## UI architecture (session #11)
-- Design system: `docs/03-design/DESIGN-SYSTEM.md`. Shell: `apps/web/src/app/Shell.tsx`. Tokens: `apps/web/tailwind.config.js`, `src/styles.css`.
-- Demo data: `node tools/seed/demo-pharmacy.mjs http://localhost:3100` (needs DEMO_MODE=true server).
-- UI audit: `node tools/ui-audit/crawl.mjs` — must print ALL CLEAN before merging shell/style changes.
-
-## Session #12 pointers
-- Reviews: `docs/03-design/reviews/`. Print audit: `node tools/ui-audit/print.mjs`. UI audit: `node tools/ui-audit/crawl.mjs`.
-- Next UI steps (from reviews, not yet done): hierarchical sub-items in nav (NavItem.children + disclosure), breadcrumbs, dark theme via `[data-theme]` CSS vars, Eastern-Arabic digits preference, apply `.table-stack` + `data-th` to list pages (items/sales/customers) on phone.
-
-## Session #13 pointers
-- Nav IA + shortcuts: `apps/web/src/app/{nav.ts,shortcuts.tsx,Shell.tsx}`. Prefs/theme: `apps/web/src/lib/prefs.ts`, `[data-theme]` block in `styles.css`.
-- Audit: `node tools/ui-audit/crawl.mjs` and `THEME=dark node tools/ui-audit/crawl.mjs` must both print ALL CLEAN.
-- Remaining (small): apply `.table-stack` + `data-th` to list pages on phone; Windows installer build (needs Windows machine).
+## 9. روابط سريعة
+- المستودع: https://github.com/moain2028/Pharmacy-System — PRs المدموجة #1…#13
+- سجل الجلسات: `docs/00-handoff/SESSION-LOG.md` · القرارات: `DECISIONS-LOG.md` · نظام التصميم: `docs/03-design/DESIGN-SYSTEM.md` · مراجعات الخبراء: `docs/03-design/reviews/`
+- Desktop: `apps/desktop/README.md` · OpenAPI: `/api/docs` على أي خادم مُشغَّل
