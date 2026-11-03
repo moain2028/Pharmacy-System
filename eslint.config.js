@@ -19,5 +19,10 @@ export default tseslint.config(
       "@typescript-eslint/no-extraneous-class": ["error", { "allowWithDecorator": true }],
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "ignoreRestSiblings": true }]
     }
+  },
+  {
+    // E2E tests assert on raw JSON bodies
+    files: ["**/test/**/*.ts"],
+    rules: { "@typescript-eslint/no-explicit-any": "off" }
   }
 );
