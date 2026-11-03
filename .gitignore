@@ -24,3 +24,5 @@ media/video/share/
 coverage/
 .turbo/
 *.tsbuildinfo
+core
+core.*

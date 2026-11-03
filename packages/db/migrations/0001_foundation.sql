@@ -106,12 +106,14 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE user_roles (
+  tenant_id uuid NOT NULL REFERENCES tenants(id),
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role_id uuid NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE user_permission_overrides (             -- D-030 per-user allow/deny + numeric limits
+  tenant_id uuid NOT NULL REFERENCES tenants(id),
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   permission text NOT NULL,
   effect text NOT NULL CHECK (effect IN ('ALLOW','DENY')),
@@ -121,6 +123,7 @@ CREATE TABLE user_permission_overrides (             -- D-030 per-user allow/den
 
 CREATE TABLE refresh_tokens (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES tenants(id),
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token_hash text NOT NULL UNIQUE,
   device_id text,
@@ -1012,7 +1015,7 @@ END $$;
 DO $$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['users','roles','exchange_rates','item_categories','items','item_units','item_barcodes','price_lists','price_list_items','price_history','official_prices',
+  FOREACH t IN ARRAY ARRAY['users','roles','user_roles','user_permission_overrides','refresh_tokens','exchange_rates','item_categories','items','item_units','item_barcodes','price_lists','price_list_items','price_history','official_prices',
                            'customers','suppliers','locations','lots','stock_movements','cashboxes','shifts','cash_movements','numbering_series',
                            'sales_invoices','sales_invoice_lines','sale_line_lots','invoice_payments','sales_returns','sales_return_lines',
                            'purchase_orders','purchase_order_lines','goods_receipts','goods_receipt_lines','supplier_invoices','supplier_invoice_lines','purchase_returns','purchase_return_lines',

@@ -11,7 +11,13 @@ export default tseslint.config(
     }
   },
   {
-    files: ["**/*.test.ts", "**/test/**/*.ts"],
-    rules: { "@typescript-eslint/no-non-null-assertion": "off" }
+    // Domain stays fully strict. Application/infra layers deal with SQL rows and Nest modules:
+    // allow `!` after explicit row checks and static-only Nest module classes.
+    files: ["**/*.test.ts", "**/test/**/*.ts", "apps/**/*.ts", "packages/db/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-extraneous-class": ["error", { "allowWithDecorator": true }],
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "ignoreRestSiblings": true }]
+    }
   }
 );
