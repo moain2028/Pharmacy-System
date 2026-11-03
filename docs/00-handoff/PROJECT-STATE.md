@@ -11,8 +11,8 @@
 |---|---|
 | المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~45%** — domain شبه مكتمل، db مكتمل، api: Identity/Catalog/Inventory؛ باقي Sales/Purchasing/Reports API + web + desktop |
-| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (747 اختبار، 99.6%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (36 اختبار E2E) |
+| نسبة الإنجاز التقديرية للمرحلة | **~55%** — domain مكتمل (كل الوحدات)، db مكتمل، api: Identity/Catalog/Inventory/Sales/Shifts؛ باقي Returns/Customers/Purchasing/Treasury/Reports API + web + desktop |
+| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (47 اختبار E2E) |
 | الفرع النشط | `genspark_ai_developer` |
 | آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
 
@@ -21,20 +21,17 @@
 
 **ما تم (Session #4 — PR #3):**
 - Monorepo pnpm+Turbo، TS strict، eslint؛ CI workflow في `ci/github/ci.yml` (**يحتاج المالك نقله إلى `.github/workflows/`** لأن توكن التطبيق لا يملك صلاحية workflows).
-- `packages/domain` (نقي، بلا I/O): kernel (Result/Money/Currency/Quantity) + fx + pricing/discount + inventory (Lot/FEFO/StockMovement/expiry/bonus) + accounting (CoA/JournalEntry/posting rules) + iam + audit + sales (SalesInvoice/totals/guards/payment/return) + cash (CashMovement/Cashbox/Shift) + purchasing (PurchaseOrder/GoodsReceipt). **747 اختبار، 99.6% statements / 98.2% branches** (العتبات 99/97).
+- `packages/domain` (نقي، بلا I/O): kernel (Result/Money/Currency/Quantity) + fx + pricing/discount + inventory (Lot/FEFO/StockMovement/expiry/bonus) + accounting (CoA/JournalEntry/posting rules) + iam + audit + sales (SalesInvoice/totals/guards/payment/return) + cash (CashMovement/Cashbox/Shift) + purchasing (PurchaseOrder/GoodsReceipt). **919 اختبار، 99.67% statements / 98.06% branches** (العتبات 99/97). أُضيفت: supplier-invoice (مطابقة ثلاثية)، purchase-return، supplier-ledger، posting-rules-treasury.
 - `packages/db`: `migrations/0001_foundation.sql` (62 جدولاً، triggers P0001..P0010، RLS FORCE، دور `pharmacore_app`)، runner بالـ checksum، `withTenant()`، 35 اختباراً تُثبت رفض كل مخالفة.
 - `apps/api` NestJS/Fastify: Identity (Argon2id، JWT + refresh دوّار مع كشف إعادة الاستخدام، قفل بعد 5 محاولات، صلاحيات `resource.action` + overrides، معالج الإعداد الأولي)، Catalog (أصناف + سلّم وحدات مرن + باركود GS1 + أسعار + سعر رسمي + أسعار صرف)، Inventory (استلام، أرصدة، FEFO preview، حالات الدفعات، تسويات، تحويلات، كاردكس، worklist الانتهاء). **36 اختبار E2E** على PostgreSQL حقيقي.
 
 **المهمة التالية بالضبط (بالترتيب):**
-1. **domain المتبقي:** `purchasing/supplier-invoice.ts` + `purchase-return.ts` + `supplier-ledger.ts` (وكيل B5 انقطع — المخرج الجزئي في `.tmp_agents/B5-purchasing-payables.json` غير صالح؛ أعد التشغيل بتقسيم أصغر، max_tokens 26000) و`accounting/posting-rules-treasury.ts`. رفع العتبات إلى 100% بعد تغطية الفروع المتبقية في `sales-invoice.ts`.
-2. **apps/api — Sales + Shifts:** افتح/أغلق وردية، فاتورة بيع (DRAFT→POSTED داخل معاملة واحدة: SALE movements + journal entry + cash_movements + invoice_payments) باستخدام `SalesInvoice`/`settleInvoice`/`postSale*` من domain؛ مرتجعات؛ عملاء. ثم Purchasing (PO/GRN/Supplier invoice/returns/payments) ثم Cash/Expenses ثم Reports.
-3. OpenAPI (`@nestjs/swagger` مثبّت) + حزمة i18n لرسائل الأخطاء (ar/en) حسب `code`.
-4. `apps/web` React + Vite + Tailwind RTL/LTR + POS لوحة-مفاتيح-أولاً.
-5. `apps/desktop` Tauri 2 + PostgreSQL مضمّن كخدمة Windows + مثبّت (اختبار نهائي على جهاز Windows عند الفريق).
-
-**قواعد تشغيل الوكلاء (مستفادة):** استخدم `tools/agents/run_agents.py` (SSE)؛ النماذج المسموحة فقط `claude-opus-5-5` و`claude-fable-5-1`؛ مهام ≤ 2–3 ملفات لكل وكيل، `max_tokens ≤ 26000`، وإلا يقطع الناتج (`fin=length`)؛ استخدم `tools/agents/salvage.py` لاستخراج الملفات الكاملة من JSON مقطوع. **عطّل core dumps** (`ulimit -c 0`) — تسرّب ملف core بحجم 2.3GB مرة وتم تنظيفه من التاريخ.
-
-**قاعدة بيانات الاختبار محلياً:** `postgres://pharmacore:pharmacore@localhost:5432/pharmacore_test` (PostgreSQL 17 في الـ sandbox؛ الهدف الرسمي 16).
+1. **API Sales Returns + Customers + Receipts** (`apps/api/src/sales/returns.service.ts`, `customers/*`): استخدم domain `SalesReturn.create(req, {defaultReturnWindowDays})` → `post()` → `postingIntent()`؛ ابنِ `PostedInvoiceSnapshot` من `sales_invoices/lines/sale_line_lots/invoice_payments` (returnedQtySsu من `sales_return_lines` المرحّلة)؛ حركات `SALE_RETURN` موجبة على اللوط الأصلي؛ القيد `salesReturnPosted` (refunds كـ PaymentPart، restock = lotCosts)؛ الاسترداد النقدي = `cash_movements` kind `SALE_REFUND` (سالب). المقبوضات: `party_payments` (party_type CUSTOMER) + `customerPaymentPosted` (arSettledBase/depositBase) + `CUSTOMER_PAYMENT` cash movement.
+2. **API Purchasing**: suppliers CRUD، PO (`PurchaseOrder`)، GRN (`GoodsReceipt` → لوطات جديدة + RECEIPT + `goodsReceiptPosted`)، فاتورة مورد (`SupplierInvoice` مع GrnLineRef؛ حسابات ap=2100, grni=2150, priceVariance=5150, tax=1500, direct=1400)، مرتجع شراء (`PurchaseReturn` returnLoss=5250)، مدفوعات الموردين (`allocatePayment` FIFO/PRO_RATA/EXPLICIT + `postSupplierPayment`).
+3. **API Treasury/Expenses/Reports**: expenses (`postExpense` بحساب الفئة)، transfers/FX (`postCashTransfer`/`postFxExchange` + حركات مزدوجة بـ pair_id)، opening balances (`postOpeningBalances` balancing=3100)؛ تقارير: ميزان مراجعة، أرباح/خسائر، مبيعات يومية/شهرية، مخزون، صلاحيات، أعمار ذمم (`ageOpenItems`).
+4. **API عام**: backup (pg_dump endpoint + جدولة)، استيراد/تصدير CSV/Excel، OpenAPI (`@nestjs/swagger`)، ترجمة الأخطاء ar/en في `http-exception.filter`.
+5. **apps/web** (React + Vite + Tailwind، RTL/LTR، i18n، POS بلوحة مفاتيح أولاً، معالج الإعداد) ثم **apps/desktop** (Tauri 2 + PostgreSQL مضمّن كخدمة Windows + مثبّت).
+6. ملاحظة ثابت الصلاحية: domain `shift.ts` يستخدم `"shift.reopen"` بينما الكتالوج `shifts.reopen` — وحّدهما عند بناء reopen.
 
 ## 3. خارطة المراحل الكلية
 | # | المرحلة | الحالة | المخرجات الرئيسية |

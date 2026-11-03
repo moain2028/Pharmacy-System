@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { Sql } from "@pharmacore/db";
-import { CURRENCY_CODES, type CurrencyCode } from "@pharmacore/domain";
+import { CURRENCY_CODES, DEFAULT_CHART, type CurrencyCode } from "@pharmacore/domain";
 import { Db } from "../infra/db.js";
 import { ApiError } from "../shared/errors.js";
 import { hashPassword } from "./password.js";
@@ -11,42 +11,13 @@ export interface SetupInput {
   readonly owner: { username: string; displayName: string; password: string; locale?: "ar" | "en" | undefined; pin?: string | undefined };
 }
 
-/** Default chart of accounts for a small pharmacy (ACCOUNTING-DESIGN §2). Codes are stable system keys. */
-export const DEFAULT_ACCOUNTS: ReadonlyArray<{ code: string; ar: string; en: string; side: "DEBIT" | "CREDIT"; type: "ASSET" | "LIABILITY" | "EQUITY" | "REVENUE" | "EXPENSE"; parent?: string; postable?: boolean; dim?: string }> = [
-  { code: "1000", ar: "الأصول", en: "Assets", side: "DEBIT", type: "ASSET", postable: false },
-  { code: "1010", ar: "الصناديق", en: "Cash on hand", side: "DEBIT", type: "ASSET", parent: "1000", dim: "cashbox" },
-  { code: "1020", ar: "البنوك والمحافظ", en: "Bank & wallets", side: "DEBIT", type: "ASSET", parent: "1000", dim: "cashbox" },
-  { code: "1100", ar: "ذمم العملاء", en: "Accounts receivable", side: "DEBIT", type: "ASSET", parent: "1000", dim: "customer" },
-  { code: "1200", ar: "المخزون", en: "Inventory", side: "DEBIT", type: "ASSET", parent: "1000", dim: "item" },
-  { code: "1300", ar: "ضريبة مدخلات", en: "Input tax", side: "DEBIT", type: "ASSET", parent: "1000" },
-  { code: "2000", ar: "الخصوم", en: "Liabilities", side: "CREDIT", type: "LIABILITY", postable: false },
-  { code: "2100", ar: "ذمم الموردين", en: "Accounts payable", side: "CREDIT", type: "LIABILITY", parent: "2000", dim: "supplier" },
-  { code: "2200", ar: "ضريبة مخرجات", en: "Output tax", side: "CREDIT", type: "LIABILITY", parent: "2000" },
-  { code: "2300", ar: "أرصدة عملاء دائنة", en: "Customer credits", side: "CREDIT", type: "LIABILITY", parent: "2000", dim: "customer" },
-  { code: "3000", ar: "حقوق الملكية", en: "Equity", side: "CREDIT", type: "EQUITY", postable: false },
-  { code: "3010", ar: "رأس المال", en: "Capital", side: "CREDIT", type: "EQUITY", parent: "3000" },
-  { code: "3020", ar: "مسحوبات المالك", en: "Owner drawings", side: "DEBIT", type: "EQUITY", parent: "3000" },
-  { code: "3030", ar: "أرباح مرحلة", en: "Retained earnings", side: "CREDIT", type: "EQUITY", parent: "3000" },
-  { code: "3900", ar: "رصيد افتتاحي", en: "Opening balance equity", side: "CREDIT", type: "EQUITY", parent: "3000" },
-  { code: "4000", ar: "الإيرادات", en: "Revenue", side: "CREDIT", type: "REVENUE", postable: false },
-  { code: "4010", ar: "المبيعات", en: "Sales", side: "CREDIT", type: "REVENUE", parent: "4000" },
-  { code: "4020", ar: "مردودات المبيعات", en: "Sales returns", side: "DEBIT", type: "REVENUE", parent: "4000" },
-  { code: "4030", ar: "خصومات المبيعات", en: "Sales discounts", side: "DEBIT", type: "REVENUE", parent: "4000" },
-  { code: "4040", ar: "فروق تقريب", en: "Rounding differences", side: "CREDIT", type: "REVENUE", parent: "4000" },
-  { code: "4050", ar: "أرباح/خسائر صرف", en: "FX gain/loss", side: "CREDIT", type: "REVENUE", parent: "4000" },
-  { code: "4060", ar: "إيرادات أخرى", en: "Other income", side: "CREDIT", type: "REVENUE", parent: "4000" },
-  { code: "5000", ar: "المصروفات", en: "Expenses", side: "DEBIT", type: "EXPENSE", postable: false },
-  { code: "5010", ar: "تكلفة البضاعة المباعة", en: "Cost of goods sold", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5020", ar: "خسائر الانتهاء والتلف", en: "Expiry & damage losses", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5030", ar: "فروق الجرد", en: "Stocktake variances", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5040", ar: "عجز/زيادة الصندوق", en: "Cash over/short", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5100", ar: "الرواتب", en: "Salaries", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5110", ar: "الإيجار", en: "Rent", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5120", ar: "الكهرباء والماء", en: "Utilities", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5130", ar: "اتصالات وإنترنت", en: "Telecom & internet", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5140", ar: "نقل وشحن", en: "Transport & freight", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5150", ar: "رسوم وتراخيص", en: "Fees & licenses", side: "DEBIT", type: "EXPENSE", parent: "5000" },
-  { code: "5190", ar: "مصروفات أخرى", en: "Other expenses", side: "DEBIT", type: "EXPENSE", parent: "5000" },
+/** Chart of accounts = the domain's canonical DEFAULT_CHART (single source of truth for posting rules). */
+const CHART = DEFAULT_CHART;
+/** Tenant-level extras used by the setup wizard and expense categories (children of canonical headers). */
+const EXTRA_ACCOUNTS: ReadonlyArray<{ code: string; ar: string; en: string; type: "ASSET" | "LIABILITY" | "EQUITY" | "REVENUE" | "EXPENSE"; side: "DEBIT" | "CREDIT"; parent: string }> = [
+  { code: "5570", ar: "اتصالات وإنترنت", en: "Telecom & internet", type: "EXPENSE", side: "DEBIT", parent: "5500" },
+  { code: "5580", ar: "نقل وشحن", en: "Transport & freight", type: "EXPENSE", side: "DEBIT", parent: "5500" },
+  { code: "5590", ar: "رسوم وتراخيص", en: "Fees & licenses", type: "EXPENSE", side: "DEBIT", parent: "5500" },
 ];
 
 @Injectable()
@@ -90,9 +61,14 @@ export class SetupService {
         VALUES (${tenantId}, ${input.owner.username}, ${input.owner.displayName}, ${passwordHash}, ${pinHash}, ${input.owner.locale ?? "ar"}) RETURNING id`;
       await tx`INSERT INTO user_roles (tenant_id, user_id, role_id) VALUES (${tenantId}, ${owner!.id}, ${roleIds["OWNER"]!})`;
 
-      for (const a of DEFAULT_ACCOUNTS) {
+      const dim = (code: string): string | null => (code === "1300" ? "customer" : code === "2100" ? "supplier" : code === "1400" ? "item" : code.startsWith("11") || code.startsWith("12") ? "cashbox" : null);
+      for (const a of CHART) {
         await tx`INSERT INTO accounts (tenant_id, code, name_ar, name_en, parent_code, normal_balance, account_type, is_postable, is_system, dimension_hint)
-          VALUES (${tenantId}, ${a.code}, ${a.ar}, ${a.en}, ${a.parent ?? null}, ${a.side}::account_side, ${a.type}, ${a.postable ?? true}, true, ${a.dim ?? null})`;
+          VALUES (${tenantId}, ${a.code}, ${a.nameAr}, ${a.nameEn}, ${a.parentCode}, ${a.normalBalance}::account_side, ${a.type}, ${a.isPostable}, true, ${dim(a.code)})`;
+      }
+      for (const a of EXTRA_ACCOUNTS) {
+        await tx`INSERT INTO accounts (tenant_id, code, name_ar, name_en, parent_code, normal_balance, account_type, is_postable, is_system, dimension_hint)
+          VALUES (${tenantId}, ${a.code}, ${a.ar}, ${a.en}, ${a.parent}, ${a.side}::account_side, ${a.type}, true, true, null)`;
       }
       await tx`INSERT INTO locations (tenant_id, code, name_ar, name_en, kind) VALUES
         (${tenantId}, 'MAIN', 'الصالة الرئيسية', 'Main floor', 'SHELF'),
@@ -107,11 +83,12 @@ export class SetupService {
         VALUES (${tenantId}, 'RETAIL', 'قائمة التجزئة', 'Retail', ${input.pharmacy.baseCurrency}::currency_code, 'RETAIL', 1000)`;
       await tx`INSERT INTO customers (tenant_id, code, name, is_walk_in) VALUES (${tenantId}, 'WALKIN', 'عميل نقدي / Walk-in', true)`;
       await tx`INSERT INTO expense_categories (tenant_id, code, name_ar, name_en, account_code) VALUES
-        (${tenantId}, 'SALARY', 'رواتب', 'Salaries', '5100'), (${tenantId}, 'RENT', 'إيجار', 'Rent', '5110'),
-        (${tenantId}, 'UTIL', 'كهرباء وماء', 'Utilities', '5120'), (${tenantId}, 'TELECOM', 'اتصالات', 'Telecom', '5130'),
-        (${tenantId}, 'TRANSPORT', 'نقل', 'Transport', '5140'), (${tenantId}, 'FEES', 'رسوم وتراخيص', 'Fees & licenses', '5150'),
-        (${tenantId}, 'OTHER', 'أخرى', 'Other', '5190')`;
-      for (const [type, prefix] of [["SALES_INVOICE", "INV-"], ["SALES_RETURN", "RET-"], ["PURCHASE_ORDER", "PO-"], ["GOODS_RECEIPT", "GRN-"], ["SUPPLIER_INVOICE", "SINV-"], ["PURCHASE_RETURN", "PRET-"], ["PAYMENT", "PAY-"], ["EXPENSE", "EXP-"], ["STOCKTAKE", "STK-"], ["ADJUSTMENT", "ADJ-"], ["JOURNAL", "JE-"], ["ITEM", "IT-"], ["INTERNAL_BARCODE", ""]] as const) {
+        (${tenantId}, 'SALARY', 'رواتب', 'Salaries', '5540'), (${tenantId}, 'RENT', 'إيجار', 'Rent', '5520'),
+        (${tenantId}, 'UTIL', 'كهرباء وماء', 'Utilities', '5510'), (${tenantId}, 'TELECOM', 'اتصالات', 'Telecom', '5570'),
+        (${tenantId}, 'TRANSPORT', 'نقل', 'Transport', '5580'), (${tenantId}, 'FEES', 'رسوم وتراخيص', 'Fees & licenses', '5590'),
+        (${tenantId}, 'MAINT', 'صيانة', 'Maintenance', '5560'), (${tenantId}, 'BANK', 'رسوم بنكية', 'Bank fees', '5550'),
+        (${tenantId}, 'OTHER', 'أخرى', 'Other', '5530')`;
+      for (const [type, prefix] of [["SALES_INVOICE", "INV-"], ["SALES_RETURN", "RET-"], ["PURCHASE_ORDER", "PO-"], ["GOODS_RECEIPT", "GRN-"], ["SUPPLIER_INVOICE", "SINV-"], ["PURCHASE_RETURN", "PRET-"], ["PAYMENT", "PAY-"], ["EXPENSE", "EXP-"], ["STOCKTAKE", "STK-"], ["ADJUSTMENT", "ADJ-"], ["JOURNAL", "JE-"], ["ITEM", "IT-"], ["INTERNAL_BARCODE", ""], ["SHIFT", ""], ["Z_REPORT", ""]] as const) {
         await tx`INSERT INTO numbering_series (tenant_id, document_type, period_key, prefix, padding) VALUES (${tenantId}, ${type}, '', ${prefix}, 6)`;
       }
       await tx`INSERT INTO audit_log (tenant_id, actor_user_id, action, entity_type, entity_id, after_data)
