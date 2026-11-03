@@ -135,3 +135,15 @@
 - **DEMO_MODE** (owner request, trial only): `DEMO_MODE=true` → `DemoSeedService` (OnApplicationBootstrap) initializes a demo pharmacy if none exists and ensures users **1/1 (OWNER)** and **2/2 (CASHIER)**, resetting their password/lock every boot. `/setup/status` returns `demo: true`; `LoginPage` shows quick-login buttons only then. Default false → production rules (8-char password, wizard) untouched. E2E `demo-mode.e2e.test.ts` (3). API **98/98**, web **44/44**.
 - Live box `/tmp/run_api.sh` now has `DEMO_MODE=true`; verified 1/1 and 2/2 log in via API and the panel renders in browser with zero console errors.
 - `install-services.ps1` documents the flag (commented out).
+
+## Session #11 — 2026-11-03 (UI architecture rebuild)
+Owner rejected the first UI (no mobile nav, no identity, empty dashboard). Rebuilt the visual architecture, not patched it:
+- **Design system** (`docs/03-design/DESIGN-SYSTEM.md`): brand/ink token ramps, shadows, motion, self-hosted Tajawal, 44 px touch targets, 16 px inputs on phones, print CSS (80 mm receipt).
+- **App shell**: grouped workflow sidebar (desktop), top bar + drawer + bottom nav (phone/tablet), inline icon set, user box, F1 POS shortcut, safe-area insets.
+- **Dashboard**: greeting/date, no-shift alert, 4 KPI cards (sales today, cash on hand, lots expiring ≤90 d, items below reorder), quick actions, cash/sales by currency, skeleton loading, 60 s refresh.
+- **Login**: split brand panel + form; demo quick-login preserved.
+- **POS**: desktop summary column (total, warnings, hotkey legend), phone pinned pay bar.
+- **Bugs found by measuring, not guessing**: page-transition `transform` made `position: fixed` children (pay bar, modals) position relative to the page → removed (opacity-only). `/auth/me` returned username as displayName (token lacked it) → now reads the user row.
+- **Demo data**: `tools/seed/demo-pharmacy.mjs` — 24 real Yemeni-market items with unit ladders/prices/EAN-13, 3 suppliers, 4 customers, PO→GRN with mixed expiry (incl. <90 d), shift, 6 sales (cash/card/credit/discount), return, expenses, receipt, supplier payment. Idempotent per phase; goes through the public API only. Ran it on the live box.
+- **UI audit**: `tools/ui-audit/crawl.mjs` — 17 routes × 3 viewports; checks JS errors, HTTP 5xx, overflow, placeholders, empty pages, tap targets. **All 51 combos clean.**
+- Web 44/44, API 98/98, build OK.
