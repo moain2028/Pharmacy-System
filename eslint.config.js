@@ -11,6 +11,11 @@ export default tseslint.config(
     }
   },
   {
+    // Desktop build/packaging scripts are plain Node ESM (.mjs): Node globals.
+    files: ["apps/desktop/scripts/**/*.mjs"],
+    languageOptions: { globals: { process: "readonly", console: "readonly", fetch: "readonly", URL: "readonly" } },
+  },
+  {
     // Domain stays fully strict. Application/infra layers deal with SQL rows and Nest modules:
     // allow `!` after explicit row checks and static-only Nest module classes.
     files: ["**/*.test.ts", "**/test/**/*.ts", "apps/**/*.ts", "packages/db/**/*.ts"],

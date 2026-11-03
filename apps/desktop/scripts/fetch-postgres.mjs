@@ -16,6 +16,7 @@ const ASSETS = [
   { name: "winsw.exe", url: "https://github.com/winsw/winsw/releases/download/v2.12.0/WinSW-x64.exe", sha256: null },
 ];
 
+/** @param {{ name: string; url: string; sha256: string | null }} a */
 async function download(a) {
   const dest = join(res, a.name);
   if (existsSync(dest)) { console.log(`exists ${a.name}`); return; }

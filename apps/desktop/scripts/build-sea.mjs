@@ -10,6 +10,7 @@ import { execSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { sidecarTriple } from "./env.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../../..");
@@ -34,7 +35,7 @@ cpSync(join(root, "packages/db/migrations"), join(out, "migrations"), { recursiv
 const seaCfg = join(out, "sea-config.json");
 writeFileSync(seaCfg, JSON.stringify({ main: bundle, output: join(out, "sea-prep.blob"), disableExperimentalSEAWarning: true, useCodeCache: true }, null, 2));
 execSync(`node --experimental-sea-config "${seaCfg}"`, { stdio: "inherit" });
-const triple = process.platform === "win32" ? "x86_64-pc-windows-msvc" : process.platform === "darwin" ? "x86_64-apple-darwin" : "x86_64-unknown-linux-gnu";
+const triple = sidecarTriple(process.platform, process.arch);
 const exe = join(out, `pharmacore-api-${triple}${process.platform === "win32" ? ".exe" : ""}`);
 cpSync(process.execPath, exe);
 if (process.platform === "win32") {
