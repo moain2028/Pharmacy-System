@@ -32,11 +32,11 @@ export default function ItemDetail() {
         <button className="btn-secondary" onClick={() => nav("/items")}>{t("common.back")}</button>
         <button className="btn-primary" onClick={() => setEdit(true)}>{t("common.edit")}</button></>} />
       <div className="card mb-3 grid grid-cols-2 gap-3 text-sm md:grid-cols-5">
-        {info.map(([l, v]) => <div key={l}><div className="text-xs text-slate-500">{l}</div><div>{v}</div></div>)}
+        {info.map(([l, v]) => <div key={l}><div className="text-xs text-ink-500">{l}</div><div>{v}</div></div>)}
         <div className="flex flex-wrap items-center gap-1">{it.rx_required !== "NONE" && <Badge tone="amber">{t("items.rx")}</Badge>}<Badge tone={it.is_active ? "green" : "red"}>{t(it.is_active ? "common.active" : "common.inactive")}</Badge></div>
       </div>
-      <div role="tablist" className="mb-3 flex flex-wrap gap-1 border-b border-slate-200">
-        {TABS.map((k) => <button key={k} role="tab" aria-selected={tab === k} className={`px-3 py-2 text-sm ${tab === k ? "border-b-2 border-brand-600 font-medium" : "text-slate-500"}`} onClick={() => setTab(k)}>{t(`items.tab.${k}`)}</button>)}
+      <div role="tablist" className="mb-3 flex flex-wrap gap-1 border-b border-ink-200">
+        {TABS.map((k) => <button key={k} role="tab" aria-selected={tab === k} className={`px-3 py-2 text-sm ${tab === k ? "border-b-2 border-brand-600 font-medium" : "text-ink-500"}`} onClick={() => setTab(k)}>{t(`items.tab.${k}`)}</button>)}
       </div>
       {tab === "units" && <UnitsTable units={it.units} />}
       {tab === "barcodes" && <BarcodesPanel item={it} />}

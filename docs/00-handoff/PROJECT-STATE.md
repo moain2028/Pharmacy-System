@@ -11,7 +11,7 @@
 |---|---|
 | المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~96%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
+| نسبة الإنجاز التقديرية للمرحلة | **~97%** — domain/db/api مكتملة (**94 E2E**، 84+ مسارًا، OpenAPI، نسخ احتياطي، استيراد/تصدير CSV، وضع سطح المكتب أحادي العملية يخدم SPA)؛ web: الأساس + شاشات المشتريات/الذمم/الصندوق/المصروفات (E4) مدمجة ومختبرة؛ desktop: Tauri 2 + سكربتات تثبيت الخدمات + مثبّت NSIS جاهزة للبناء على ويندوز؛ باقي: دمج شاشات POS/الأصناف/المخزون/المبيعات/المرتجعات/العملاء/التقارير/المستخدمين (وكلاء E1,E2a/b,E3a/b,E5a/b)، إكمال smoke test، بناء المثبّت على جهاز ويندوز |
 | هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (89 اختبار E2E، 84 مسارًا، OpenAPI على /api/docs)، `apps/web` (أساس: عميل API، مخزن مصادقة، i18n ar/en، Shell RTL/LTR، دخول، معالج إعداد، لوحة) |
 | الفرع النشط | `genspark_ai_developer` |
 | آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
@@ -96,3 +96,7 @@
 - Design system: `docs/03-design/DESIGN-SYSTEM.md`. Shell: `apps/web/src/app/Shell.tsx`. Tokens: `apps/web/tailwind.config.js`, `src/styles.css`.
 - Demo data: `node tools/seed/demo-pharmacy.mjs http://localhost:3100` (needs DEMO_MODE=true server).
 - UI audit: `node tools/ui-audit/crawl.mjs` — must print ALL CLEAN before merging shell/style changes.
+
+## Session #12 pointers
+- Reviews: `docs/03-design/reviews/`. Print audit: `node tools/ui-audit/print.mjs`. UI audit: `node tools/ui-audit/crawl.mjs`.
+- Next UI steps (from reviews, not yet done): hierarchical sub-items in nav (NavItem.children + disclosure), breadcrumbs, dark theme via `[data-theme]` CSS vars, Eastern-Arabic digits preference, apply `.table-stack` + `data-th` to list pages (items/sales/customers) on phone.

@@ -19,10 +19,10 @@ export default function SetupWizard() {
     } catch (ex) { setErr(ex); } finally { setBusy(false); }
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-slate-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-ink-100 p-4">
       <form onSubmit={finish} className="card w-full max-w-lg space-y-4">
         <h1 className="text-xl font-semibold">{t("setup.title")}</h1>
-        <ol className="flex gap-2 text-xs">{[t("setup.pharmacy"), t("setup.owner"), t("setup.done")].map((s, i) => <li key={s} className={`rounded-full px-3 py-1 ${i === step ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"}`}>{i + 1}. {s}</li>)}</ol>
+        <ol className="flex gap-2 text-xs">{[t("setup.pharmacy"), t("setup.owner"), t("setup.done")].map((s, i) => <li key={s} className={`rounded-full px-3 py-1 ${i === step ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600"}`}>{i + 1}. {s}</li>)}</ol>
         {step === 0 && <>
           <Field label={`${t("setup.pharmacy")} (ar)`}><input className="w-full" value={f.nameAr} onChange={up("nameAr")} required /></Field>
           <Field label={`${t("setup.pharmacy")} (en)`}><input className="w-full" value={f.nameEn} onChange={up("nameEn")} /></Field>

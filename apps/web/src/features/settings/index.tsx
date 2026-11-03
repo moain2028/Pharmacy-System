@@ -54,14 +54,14 @@ export default function SettingsPage() {
       </section>
       <section className="card" aria-labelledby="set-bk">
         <h2 id="set-bk" className="mb-2 font-semibold">{t("set.backup")}</h2>
-        <p className="mb-2 text-sm text-slate-600">{t("set.backupDesc")}</p>
+        <p className="mb-2 text-sm text-ink-600">{t("set.backupDesc")}</p>
         {unavailable ? <p role="note" className="rounded-md bg-amber-50 p-2 text-sm text-amber-800">{t("set.backupUnavailable")}</p>
           : <button className="btn-primary" disabled={backup.isPending} onClick={() => backup.mutate()}>{backup.isPending ? t("common.loading") : t("set.backupRun")}</button>}
       </section>
       <section className="card" aria-labelledby="set-about">
         <h2 id="set-about" className="mb-2 font-semibold">{t("set.about")}</h2>
         <p className="text-sm">{t("app.name")} — {t("set.aboutText")}</p>
-        <p className="text-sm text-slate-500">{t("set.version")}: <span className="num">{VERSION}</span></p>
+        <p className="text-sm text-ink-500">{t("set.version")}: <span className="num">{VERSION}</span></p>
       </section>
     </div>
   );

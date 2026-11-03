@@ -62,7 +62,7 @@ export default function ExpiryPage() {
 
       {list.isLoading ? <Spinner /> : list.error ? <ErrorBox error={list.error} onRetry={() => void list.refetch()} /> : visible.length === 0 ? <Empty /> : (
         <div className="card overflow-auto">
-          <div className="mb-2 text-xs text-slate-500">{t("exp.count", { n: visible.length })}</div>
+          <div className="mb-2 text-xs text-ink-500">{t("exp.count", { n: visible.length })}</div>
           <table>
             <thead><tr><th>{t("exp.item")}</th><th>{t("stock.lot")}</th><th>{t("stock.expiry")}</th><th>{t("exp.daysLeft")}</th><th>{t("stock.onHand")}</th><th>{t("common.status")}</th><th>{t("common.actions")}</th></tr></thead>
             <tbody>
@@ -88,7 +88,7 @@ export default function ExpiryPage() {
           <button type="button" className="btn-secondary" onClick={close}>{t("common.cancel")}</button>
           <button type="button" className="btn-primary" disabled={quarantine.isPending} onClick={confirm}>{t("common.confirm")}</button>
         </>}>
-        {target && <div className="mb-3 text-sm text-slate-600">{nameOf(target)} · <span className="num">{target.lot_number}</span> · <span className="num">{target.expiry_date ?? "—"}</span></div>}
+        {target && <div className="mb-3 text-sm text-ink-600">{nameOf(target)} · <span className="num">{target.lot_number}</span> · <span className="num">{target.expiry_date ?? "—"}</span></div>}
         <Field label={t("common.reason")} {...(reasonErr ? { error: reasonErr } : {})}>
           <input className="input" autoFocus value={reason} placeholder={t("exp.reasonPlaceholder")} onChange={(e) => setReason(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") confirm(); }} />
         </Field>

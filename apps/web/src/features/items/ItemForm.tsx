@@ -98,7 +98,7 @@ export default function ItemForm({ initial, onSubmit, onCancel, submitting, erro
   );
   const cell = (i: number, k: TextKey, v: string, err: string | undefined, num: boolean) => (
     <td><input className={`input min-w-24${num ? " num" : ""}`} aria-label={t(TEXT_LABEL[k])} value={v} onChange={(e) => upd(i, { [k]: e.target.value } as Pick<UnitDraft, TextKey>)} data-testid={`u-${k}-${i}`} />
-      {err && <span role="alert" className="mt-1 block text-xs text-red-600">{t(err)}</span>}</td>
+      {err && <span role="alert" className="mt-1 block text-xs text-danger-700">{t(err)}</span>}</td>
   );
 
   return (
@@ -118,15 +118,15 @@ export default function ItemForm({ initial, onSubmit, onCancel, submitting, erro
       <div>
         <div className="mb-1 flex items-center justify-between"><h3 className="font-medium">{t("items.units")}</h3>
           <button type="button" className="btn-secondary" onClick={() => setUnits((p) => [...p, blankUnit(p.length + 1, p.length === 0)])}>{t("items.addUnit")}</button></div>
-        <p className="mb-2 text-xs text-slate-500">{t("items.ladderHint")}</p>
-        {le.form.map((k) => <div key={k} role="alert" className="mb-2 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">{t(k)}</div>)}
+        <p className="mb-2 text-xs text-ink-500">{t("items.ladderHint")}</p>
+        {le.form.map((k) => <div key={k} role="alert" className="mb-2 rounded border border-danger-200 bg-danger-50 p-2 text-sm text-danger-700">{t(k)}</div>)}
         <div className="overflow-x-auto"><table>
           <thead><tr><th>{t("items.unitNameAr")}</th><th>{t("items.unitNameEn")}</th><th>{t("items.factor")}</th><th>{t("items.level")}</th>{FLAGS.map((f) => <th key={f}>{t(FLAG_LABEL[f])}</th>)}<th /></tr></thead>
           <tbody>{units.map((u, i) => { const re = le.rows[i] ?? {}; return (
             <tr key={i}>
               {cell(i, "nameAr", u.nameAr, re.nameAr, false)}{cell(i, "nameEn", u.nameEn, re.nameEn, false)}{cell(i, "factor", u.factor, re.factor, true)}{cell(i, "level", u.level, re.level, true)}
               {FLAGS.map((f) => <td key={f} className="text-center"><input type="checkbox" aria-label={t(FLAG_LABEL[f])} checked={u[f]} onChange={(e) => upd(i, { [f]: e.target.checked } as Pick<UnitDraft, FlagKey>)} data-testid={`u-${f}-${i}`} /></td>)}
-              <td><button type="button" aria-label={t("items.removeUnit")} className="text-red-600" onClick={() => setUnits((p) => p.filter((_, j) => j !== i))}>✕</button></td>
+              <td><button type="button" aria-label={t("items.removeUnit")} className="text-danger-700" onClick={() => setUnits((p) => p.filter((_, j) => j !== i))}>✕</button></td>
             </tr>); })}</tbody>
         </table></div>
       </div>

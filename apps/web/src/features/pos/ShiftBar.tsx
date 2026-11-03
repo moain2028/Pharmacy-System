@@ -62,7 +62,7 @@ function OpenShiftForm({ boxes, selectRef }: { boxes: Cashbox[]; selectRef: RefO
   const submit = (e: FormEvent) => { e.preventDefault(); if (!cashboxId) { toast.err(t("pos.selectCashbox")); return; } m.mutate(); };
   return (
     <form onSubmit={submit} className="card space-y-3" aria-label={t("shift.open")}>
-      <div className="flex items-center gap-2"><Badge tone="amber">{t("shift.none")}</Badge><span className="text-sm text-slate-600">{t("pos.noShift")}</span></div>
+      <div className="flex items-center gap-2"><Badge tone="amber">{t("shift.none")}</Badge><span className="text-sm text-ink-600">{t("pos.noShift")}</span></div>
       <div className="grid gap-3 md:grid-cols-5">
         <Field label={t("pos.cashbox")}>
           <select ref={selectRef} className="input" value={cashboxId} onChange={(e) => setCashboxId(e.target.value)} required>
@@ -165,7 +165,7 @@ function CloseModal({ shift, onClose }: { shift: ShiftView; onClose: () => void 
                   <td>{CURRENCY_LABEL[c]?.[locale] ?? c}</td>
                   <td className="num">{fmtMinor(expectedOf(c), c, locale)}</td>
                   <td><input aria-label={`${t("shift.counted")} ${c}`} className="input num w-32" inputMode="decimal" placeholder="0" value={counts[c] ?? ""} onChange={(e) => setCounts((x) => ({ ...x, [c]: e.target.value }))} /></td>
-                  <td className={`num ${v && v !== 0n ? (v < 0n ? "text-red-700" : "text-amber-700") : ""}`}>{v === null ? t("pos.invalidAmount") : fmtMinor(v, c, locale)}</td>
+                  <td className={`num ${v && v !== 0n ? (v < 0n ? "text-danger-700" : "text-amber-700") : ""}`}>{v === null ? t("pos.invalidAmount") : fmtMinor(v, c, locale)}</td>
                   <td>{v !== null && v !== 0n && <input aria-label={`${t("pos.varianceReason")} ${c}`} className="input w-full" value={reasons[c] ?? ""} onChange={(e) => setReasons((x) => ({ ...x, [c]: e.target.value }))} />}</td>
                 </tr>
               );
@@ -173,7 +173,7 @@ function CloseModal({ shift, onClose }: { shift: ShiftView; onClose: () => void 
           </tbody>
         </table>
         <details className="text-sm">
-          <summary className="cursor-pointer text-slate-600">{t("pos.approverOpt")}</summary>
+          <summary className="cursor-pointer text-ink-600">{t("pos.approverOpt")}</summary>
           <div className="mt-2 grid gap-2 md:grid-cols-2">
             <input className="input" autoComplete="off" placeholder="username" value={approver.username} onChange={(e) => setApprover((a) => ({ ...a, username: e.target.value }))} />
             <input className="input" type="password" autoComplete="new-password" placeholder="••••" value={approver.secret} onChange={(e) => setApprover((a) => ({ ...a, secret: e.target.value }))} />

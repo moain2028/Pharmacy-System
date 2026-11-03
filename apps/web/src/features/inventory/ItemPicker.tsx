@@ -42,8 +42,8 @@ export function ItemPicker({ value, onSelect, autoFocus }: { value: ItemWithUnit
   const pick = useMutation({ mutationFn: (id: string) => get<ItemWithUnits>(`/items/${id}`), onSuccess: (it) => { onSelect(it); setQ(""); } });
   if (value) {
     return (
-      <div className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 p-2 text-sm">
-        <div><span className="font-medium">{itemNameOf(value, locale)}</span> <span className="num text-xs text-slate-500">{value.code}</span></div>
+      <div className="flex items-center justify-between gap-2 rounded-md border border-ink-200 bg-ink-50 p-2 text-sm">
+        <div><span className="font-medium">{itemNameOf(value, locale)}</span> <span className="num text-xs text-ink-500">{value.code}</span></div>
         <button type="button" className="btn-secondary" onClick={() => onSelect(null)}>{t("inv.change")}</button>
       </div>
     );
@@ -57,11 +57,11 @@ export function ItemPicker({ value, onSelect, autoFocus }: { value: ItemWithUnit
       {search.error && <ErrorBox error={search.error} />}
       {pick.error && <ErrorBox error={pick.error} />}
       {search.data && dq && (search.data.length === 0 ? <Empty>{t("inv.noResults")}</Empty> : (
-        <ul role="listbox" aria-label={t("inv.item")} className="mt-1 max-h-60 overflow-auto rounded-md border border-slate-200 bg-white">
+        <ul role="listbox" aria-label={t("inv.item")} className="mt-1 max-h-60 overflow-auto rounded-md border border-ink-200 bg-white">
           {search.data.map((r) => (
             <li key={r.id}>
-              <button type="button" role="option" aria-selected={false} disabled={pick.isPending} className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:bg-slate-50" onClick={() => pick.mutate(r.id)}>
-                <span>{itemNameOf(r, locale)}{r.strength ? ` ${r.strength}` : ""}</span><span className="num text-xs text-slate-500">{r.code}</span>
+              <button type="button" role="option" aria-selected={false} disabled={pick.isPending} className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:bg-ink-50" onClick={() => pick.mutate(r.id)}>
+                <span>{itemNameOf(r, locale)}{r.strength ? ` ${r.strength}` : ""}</span><span className="num text-xs text-ink-500">{r.code}</span>
               </button>
             </li>
           ))}

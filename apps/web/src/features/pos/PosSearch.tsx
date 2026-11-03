@@ -54,15 +54,15 @@ export default function PosSearch({ inputRef, onPick }: Props) {
       <input ref={inputRef} autoFocus role="combobox" aria-expanded={rows.length > 0} aria-controls="pos-results" aria-label={t("pos.scanOrSearch")}
         placeholder={t("pos.scanOrSearch")} className="input w-full text-lg" value={q} autoComplete="off"
         onChange={(e) => { setQ(e.target.value); setHi(0); }} onKeyDown={onKey} />
-      {showNone && <div className="absolute z-20 mt-1 w-full rounded-md border bg-white p-3 text-sm text-slate-500 shadow">{t("pos.noResults")}</div>}
+      {showNone && <div className="absolute z-20 mt-1 w-full rounded-md border bg-white p-3 text-sm text-ink-500 shadow">{t("pos.noResults")}</div>}
       {rows.length > 0 && (
         <ul id="pos-results" role="listbox" className="absolute z-20 mt-1 max-h-80 w-full overflow-auto rounded-md border bg-white shadow">
           {rows.map((r, i) => (
             <li key={r.id} role="option" aria-selected={i === hi} onMouseEnter={() => setHi(i)}
               onMouseDown={(e) => { e.preventDefault(); pick(r.id); }}
-              className={`flex cursor-pointer justify-between gap-2 px-3 py-2 ${i === hi ? "bg-slate-100" : ""}`}>
+              className={`flex cursor-pointer justify-between gap-2 px-3 py-2 ${i === hi ? "bg-ink-100" : ""}`}>
               <span>{locale === "ar" ? r.trade_name_ar : r.trade_name_en}</span>
-              <span className="num text-xs text-slate-500">{[r.strength, r.code].filter(Boolean).join(" · ")}</span>
+              <span className="num text-xs text-ink-500">{[r.strength, r.code].filter(Boolean).join(" · ")}</span>
             </li>
           ))}
         </ul>

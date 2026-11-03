@@ -4,13 +4,16 @@ import { ErrorBox, Spinner } from "@/components/ui";
 import { ReportTable, type Column } from "./ReportTable";
 import { downloadCsv, toCsv, type Row } from "./csv";
 import { todayIso } from "./util";
+import { PrintFrame } from "@/components/PrintFrame";
 
 interface Props {
   title: string; filename: string; filters?: ReactNode | undefined; loading: boolean; error: unknown; onRetry: () => void;
   columns: Column[]; rows: Row[]; totals?: Row | undefined; children?: ReactNode | undefined;
+  /** Human-readable period/filter summary for the printed header (e.g. "2026-03-01 → 2026-03-31"). */
+  period?: string | undefined;
 }
 
-export function ReportView({ title, filename, filters, loading, error, onRetry, columns, rows, totals, children }: Props) {
+export function ReportView({ title, filename, filters, loading, error, onRetry, columns, rows, totals, children, period }: Props) {
   const { t } = useT();
   const exportCsv = () => {
     const first = columns[0];
@@ -18,6 +21,7 @@ export function ReportView({ title, filename, filters, loading, error, onRetry, 
     downloadCsv(`${filename}-${todayIso()}.csv`, toCsv(rows, columns, label));
   };
   return (
+    <PrintFrame title={title} period={period} landscape={columns.length > 7}>
     <section className="card mb-4" aria-label={title}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold">{title}</h2>
@@ -30,5 +34,6 @@ export function ReportView({ title, filename, filters, loading, error, onRetry, 
       {loading ? <Spinner /> : error ? <ErrorBox error={error} onRetry={onRetry} /> : <ReportTable columns={columns} rows={rows} totals={totals} />}
       {children}
     </section>
+    </PrintFrame>
   );
 }

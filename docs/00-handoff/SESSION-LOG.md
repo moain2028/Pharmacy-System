@@ -147,3 +147,12 @@ Owner rejected the first UI (no mobile nav, no identity, empty dashboard). Rebui
 - **Demo data**: `tools/seed/demo-pharmacy.mjs` — 24 real Yemeni-market items with unit ladders/prices/EAN-13, 3 suppliers, 4 customers, PO→GRN with mixed expiry (incl. <90 d), shift, 6 sales (cash/card/credit/discount), return, expenses, receipt, supplier payment. Idempotent per phase; goes through the public API only. Ran it on the live box.
 - **UI audit**: `tools/ui-audit/crawl.mjs` — 17 routes × 3 viewports; checks JS errors, HTTP 5xx, overflow, placeholders, empty pages, tap targets. **All 51 combos clean.**
 - Web 44/44, API 98/98, build OK.
+
+## Session #12 — 2026-11-03 (pixel audit with sub-agents)
+Owner flagged: KPI number colliding with icon + currency wrapping; print preview clipped with a scrollbar; language toggle in primary nav; "font/colours feel off". Ran 3 independent reviews in parallel (Astra: defects/spacing/print; Opus 5.5: typography+colour with WCAG ratios; Opus 5.5: mobile ergonomics) — saved under `docs/03-design/reviews/`. Applied, measured, verified:
+- **KPI**: icon on label row, value full-width, `clamp()` size, currency `nowrap` — collision impossible.
+- **Print architecture**: `PrintFrame` (pharmacy header, title, period, printed-by/at, footer page no.), A4 `@page`, repeating thead, rows don't split, auto-landscape >7 cols, tables fit page (no scroll). Verified by PDF render.
+- **Typography/colour study applied**: IBM Plex Sans + Plex Sans Arabic (self-hosted, real `tnum`), hue-matched neutrals, brand-700 primary, AA/AAA contrast table in DESIGN-SYSTEM.md; no 800 weight/uppercase/tracking on Arabic; U+2212 minus.
+- **Ergonomics/a11y**: 16 px root; 48 px coarse targets; `viewport-fit=cover`; checkbox sizing; `<html lang dir>` sync; Modal focus trap/restore; persistent error toasts + dismiss; `aria-describedby`; RTL select padding; numeric alignment; `.table-stack`.
+- **IA**: language moved to Settings (already had a radio group); UserBox now links Settings; calmer active-nav indicator (M3 rail style).
+- Migrated 32 feature files from `slate/red` to tokens. Web 44/44, eslint 0, audit **51/51 clean**, print PDF verified.

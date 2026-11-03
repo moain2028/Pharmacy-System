@@ -39,7 +39,7 @@ export function RatesTab() {
   return (
     <div className="grid gap-4">
       <form className="card grid gap-3" onSubmit={submit} noValidate>
-        {err && <p role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700">{err}</p>}
+        {err && <p role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700">{err}</p>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           <Field label={t("acc.rate.from")}><select className="input" value={from} onChange={(e) => setFrom(e.target.value)}>{CURS.map((c) => <option key={c} value={c}>{label(c)}</option>)}</select></Field>
           <Field label={t("acc.rate.to")}><select className="input" value={to} onChange={(e) => setTo(e.target.value)}>{CURS.map((c) => <option key={c} value={c}>{label(c)}</option>)}</select></Field>
@@ -48,7 +48,7 @@ export function RatesTab() {
           <Field label={t("acc.rate.effective")}><input type="date" className="input num" value={eff} onChange={(e) => setEff(e.target.value)} /></Field>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-500">{t("acc.rate.hint", { from: label(from), to: label(to) })}</span>
+          <span className="text-xs text-ink-500">{t("acc.rate.hint", { from: label(from), to: label(to) })}</span>
           <button type="submit" className="btn-primary" disabled={m.isPending}>{t("acc.rate.add")}</button>
         </div>
       </form>

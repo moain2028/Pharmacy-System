@@ -36,7 +36,7 @@ function ItemLot(p: { item: ItemWithUnits | null; lot: Balance | null; onItem: (
   return (
     <div className="grid gap-3 md:col-span-2">
       <ItemPicker value={p.item} onSelect={p.onItem} autoFocus />
-      {p.itemErr && <div role="alert" className="text-xs text-red-600">{p.itemErr}</div>}
+      {p.itemErr && <div role="alert" className="text-xs text-danger-700">{p.itemErr}</div>}
       {p.item && <LotPicker itemId={p.item.id} value={p.lot} onSelect={p.onLot} locations={p.locations} error={p.lotErr} />}
     </div>
   );
@@ -71,7 +71,7 @@ export function ReceiveForm({ locations }: { locations: Location[] }) {
   };
   return (
     <form onSubmit={submit} noValidate className="card grid gap-3 md:grid-cols-2">
-      <div className="md:col-span-2"><ItemPicker value={item} onSelect={pickItem} autoFocus />{errs.item && <div role="alert" className="text-xs text-red-600">{errs.item}</div>}</div>
+      <div className="md:col-span-2"><ItemPicker value={item} onSelect={pickItem} autoFocus />{errs.item && <div role="alert" className="text-xs text-danger-700">{errs.item}</div>}</div>
       <LocationSelect label={t("inv.location")} value={f.locationId} onChange={set("locationId")} locations={locations} error={errs.locationId} />
       <Field label={t("inv.unit")} {...fe(errs.unitId)}>
         <select className="input" value={f.unitId} onChange={(e) => set("unitId")(e.target.value)} disabled={!item}>

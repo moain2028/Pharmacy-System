@@ -6,7 +6,7 @@ export const ar: Record<string, string> = {
   "dash.expiring90": "لوطات تنتهي خلال 90 يومًا", "dash.units": "وحدة", "dash.lowStock": "أصناف تحت حد الطلب", "dash.belowReorder": "تحتاج إعادة طلب",
   "dash.quickActions": "إجراءات سريعة", "dash.receiveGoods": "استلام بضاعة", "dash.newItem": "صنف جديد", "dash.recordExpense": "تسجيل مصروف",
   "dash.cashByCurrency": "النقد حسب العملة", "dash.salesByCurrency": "المبيعات حسب العملة", "dash.noShiftHint": "لا توجد وردية مفتوحة — افتح وردية من نقطة البيع لبدء العمل",
-  "app.name": "فارماكور",
+  "print.period": "الفترة", "print.printedAt": "تاريخ الطباعة", "print.printedBy": "طُبع بواسطة", "dash.updatedAt": "آخر تحديث", "common.refresh": "تحديث", "app.name": "فارماكور",
   "common.save": "حفظ", "common.cancel": "إلغاء", "common.close": "إغلاق", "common.search": "بحث", "common.loading": "جارٍ التحميل…", "common.actions": "إجراءات",
   "common.yes": "نعم", "common.no": "لا", "common.confirm": "تأكيد", "common.delete": "حذف", "common.edit": "تعديل", "common.new": "جديد", "common.back": "رجوع", "common.next": "التالي",
   "common.date": "التاريخ", "common.from": "من", "common.to": "إلى", "common.total": "الإجمالي", "common.status": "الحالة", "common.notes": "ملاحظات", "common.reason": "السبب",

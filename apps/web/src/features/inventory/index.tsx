@@ -26,10 +26,10 @@ export default function InventoryPage() {
   return (
     <div>
       <PageHeader title={t("inv.title")} />
-      <div role="tablist" aria-label={t("inv.title")} className="mb-4 flex flex-wrap gap-1 border-b border-slate-200">
+      <div role="tablist" aria-label={t("inv.title")} className="mb-4 flex flex-wrap gap-1 border-b border-ink-200">
         {TABS.map((k) => (
           <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
-            className={`px-3 py-2 text-sm ${tab === k ? "border-b-2 border-brand-600 font-medium text-brand-700" : "text-slate-500 hover:text-slate-800"}`}>
+            className={`px-3 py-2 text-sm ${tab === k ? "border-b-2 border-brand-600 font-medium text-brand-700" : "text-ink-500 hover:text-ink-800"}`}>
             {t(LABEL[k])}
           </button>
         ))}

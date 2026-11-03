@@ -49,7 +49,7 @@ export function UserForm({ user, onClose }: { user: UserRow | null; onClose: () 
     <Modal open onClose={onClose} title={user ? t("users.edit") : t("users.new")}
       footer={<><button type="button" className="btn-secondary" onClick={onClose}>{t("common.cancel")}</button><button type="submit" form="user-form" className="btn-primary" disabled={m.isPending}>{t("common.save")}</button></>}>
       <form id="user-form" className="grid gap-3" onSubmit={submit} noValidate>
-        {err && <p role="alert" className="rounded-md bg-red-50 p-2 text-sm text-red-700">{err}</p>}
+        {err && <p role="alert" className="rounded-md bg-danger-50 p-2 text-sm text-danger-700">{err}</p>}
         <Field label={t("users.username")}>
           <input className="input" dir="ltr" autoFocus={!user} disabled={!!user} value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="off" />
         </Field>
@@ -70,7 +70,7 @@ export function UserForm({ user, onClose }: { user: UserRow | null; onClose: () 
           </Field>
         </div>
         {user && <label className="flex items-center gap-2"><input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /><span>{t("users.active")}</span></label>}
-        <fieldset className="rounded-md border border-slate-200 p-2">
+        <fieldset className="rounded-md border border-ink-200 p-2">
           <legend className="label px-1">{t("users.roles")}</legend>
           {roles.isLoading ? <Spinner /> : roles.error ? <ErrorBox error={roles.error} /> : (
             <div className="grid grid-cols-2 gap-1">

@@ -17,7 +17,7 @@ export function ReportTable({ columns, rows, totals }: { columns: Column[]; rows
   const { t, locale } = useT();
   if (rows.length === 0) return <Empty />;
   return (
-    <div className="overflow-x-auto">
+    <div className="table-wrap">
       <table className="w-full">
         <thead><tr>{columns.map((c) => <th key={c.key} scope="col" className={cls(c)}>{c.title}</th>)}</tr></thead>
         <tbody>

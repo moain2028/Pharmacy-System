@@ -31,17 +31,17 @@ function CustomerPicker() {
   const list = q.trim() ? res.data ?? [] : [];
   return (
     <div className="relative flex items-center gap-2 text-sm">
-      <span className="text-slate-500">{t("pos.customer")}:</span>
+      <span className="text-ink-500">{t("pos.customer")}:</span>
       <Badge tone={customer ? "blue" : "slate"}>{customer?.name ?? t("pos.walkIn")}</Badge>
-      {customer && <button type="button" aria-label={t("pos.walkIn")} className="text-slate-400 hover:text-slate-700" onClick={() => setCustomer(null)}>✕</button>}
+      {customer && <button type="button" aria-label={t("pos.walkIn")} className="text-ink-400 hover:text-ink-700" onClick={() => setCustomer(null)}>✕</button>}
       <input aria-label={t("pos.searchCustomer")} placeholder={t("pos.searchCustomer")} className="input w-48" value={q} onChange={(e) => setQ(e.target.value)} />
       {list.length > 0 && (
         <ul className="absolute end-0 top-full z-10 mt-1 w-64 rounded-md border bg-white shadow">
           {list.map((c) => (
             <li key={c.id}>
-              <button type="button" className="w-full px-3 py-1 text-start hover:bg-slate-100"
+              <button type="button" className="w-full px-3 py-1 text-start hover:bg-ink-100"
                 onClick={() => { setCustomer(c.is_walk_in ? null : { id: c.id, name: c.name }); setQ(""); }}>
-                {c.name} <span className="num text-xs text-slate-500">{c.phone ?? ""}</span>
+                {c.name} <span className="num text-xs text-ink-500">{c.phone ?? ""}</span>
               </button>
             </li>
           ))}
@@ -85,7 +85,7 @@ function LineRow({ line, ql }: { line: CartLine; ql: QuoteLine | undefined }) {
       </td>
       <td><PctInput label={t("pos.lineDiscPct")} value={line.lineDiscountBp ?? 0} onChange={(bp) => setLineDiscount(line.key, bp || undefined)} /></td>
       <td className="num">{ql ? fmtMoney(ql.total, locale) : "…"}</td>
-      <td><button type="button" aria-label={t("pos.remove")} className="text-red-500 hover:text-red-700" onClick={() => remove(line.key)}>✕</button></td>
+      <td><button type="button" aria-label={t("pos.remove")} className="text-danger-500 hover:text-danger-700" onClick={() => remove(line.key)}>✕</button></td>
     </tr>
   );
 }
@@ -98,7 +98,7 @@ export default function Cart({ quote }: { quote: Quote | undefined }) {
   return (
     <div className="card">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">{t("pos.cart")} <span className="num text-slate-500">({lines.length})</span></h2>
+        <h2 className="font-semibold">{t("pos.cart")} <span className="num text-ink-500">({lines.length})</span></h2>
         <CustomerPicker />
       </div>
       {lines.length === 0 ? <Empty>{t("pos.empty")}</Empty> : (

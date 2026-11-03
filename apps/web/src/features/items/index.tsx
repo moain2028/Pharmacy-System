@@ -36,9 +36,9 @@ function ItemsList() {
         <div className="card overflow-x-auto"><table>
           <thead><tr><th>{t("items.code")}</th><th>{t("item.tradeName")}</th><th>{t("items.generic")}</th><th>{t("items.strength")}</th><th>{t("items.rx")}</th><th>{t("item.taxBp")}</th><th>{t("common.status")}</th><th>{t("common.actions")}</th></tr></thead>
           <tbody>{rows.map((r) => (
-            <tr key={r.id} className="cursor-pointer hover:bg-slate-50" onClick={() => nav(`/items/${r.id}`)}>
+            <tr key={r.id} className="cursor-pointer hover:bg-ink-50" onClick={() => nav(`/items/${r.id}`)}>
               <td className="num">{r.code}</td>
-              <td><div>{locale === "ar" ? r.trade_name_ar : r.trade_name_en}</div><div className="text-xs text-slate-500">{locale === "ar" ? r.trade_name_en : r.trade_name_ar}</div></td>
+              <td><div>{locale === "ar" ? r.trade_name_ar : r.trade_name_en}</div><div className="text-xs text-ink-500">{locale === "ar" ? r.trade_name_en : r.trade_name_ar}</div></td>
               <td>{r.generic_name ?? "—"}</td><td>{[r.strength, r.dosage_form].filter(Boolean).join(" · ") || "—"}</td>
               <td>{r.rx_required && r.rx_required !== "NONE" ? <Badge tone="amber">{t(`items.rx.${r.rx_required}`)}</Badge> : <Badge>{t("items.rx.NONE")}</Badge>}</td>
               <td className="num">{(r.tax_bp ?? 0) / 100}%</td>

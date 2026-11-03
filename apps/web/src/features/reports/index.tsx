@@ -27,7 +27,6 @@ const TABS: readonly Tab[] = [
   { id: "audit", label: "reports.tab.audit", C: AuditReport },
 ];
 
-const PRINT_CSS = "@media print{body *{visibility:hidden!important}.print-area,.print-area *{visibility:visible!important}.print-area{position:absolute;inset-inline-start:0;top:0;width:100%}.print-area .card{box-shadow:none;border:0}.no-print{display:none!important}}";
 
 export default function ReportsPage() {
   const { t } = useT();
@@ -36,7 +35,6 @@ export default function ReportsPage() {
   const Active = active.C;
   return (
     <div>
-      <style>{PRINT_CSS}</style>
       <div className="no-print"><PageHeader title={t("nav.reports")} /></div>
       <div className="flex flex-col gap-4 md:flex-row">
         <nav aria-label={t("nav.reports")} className="no-print md:w-56 md:shrink-0">
@@ -44,7 +42,7 @@ export default function ReportsPage() {
             {TABS.map((x) => (
               <li key={x.id}>
                 <button type="button" aria-current={x.id === active.id ? "page" : undefined} onClick={() => setTab(x.id)}
-                  className={`w-full rounded-md px-3 py-2 text-start text-sm ${x.id === active.id ? "bg-brand-600 text-white" : "hover:bg-slate-100"}`}>
+                  className={`w-full rounded-md px-3 py-2 text-start text-sm ${x.id === active.id ? "bg-brand-600 text-white" : "hover:bg-ink-100"}`}>
                   {t(x.label)}
                 </button>
               </li>
