@@ -114,6 +114,14 @@ export async function resetDatabase(sql: Sql, opts: { readonly allowDestructive:
   await sql.unsafe("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
 }
 
+/**
+ * Opens a pool. `date` columns (OID 1082) are returned as plain "YYYY-MM-DD" strings instead of
+ * JS Dates: business dates (expiry, business_date) must never shift with the server timezone.
+ */
 export function connect(url: string, max = 4): Sql {
-  return postgres(url, { max, onnotice: () => undefined });
+  return postgres(url, {
+    max,
+    onnotice: () => undefined,
+    types: { date: { to: 1082, from: [1082], serialize: (x: string) => x, parse: (x: string) => x } },
+  });
 }
