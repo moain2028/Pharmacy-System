@@ -11,8 +11,8 @@
 |---|---|
 | المرحلة | **Phase 2 — Foundation Code (domain + db + api)** |
 | الحالة | قيد التنفيذ |
-| نسبة الإنجاز التقديرية للمرحلة | **~55%** — domain مكتمل (كل الوحدات)، db مكتمل، api: Identity/Catalog/Inventory/Sales/Shifts؛ باقي Returns/Customers/Purchasing/Treasury/Reports API + web + desktop |
-| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (47 اختبار E2E) |
+| نسبة الإنجاز التقديرية للمرحلة | **~70%** — domain مكتمل، db مكتمل، **api مكتمل** (Identity/Catalog/Inventory/Sales/Shifts/Returns/Customers/Purchasing/Payables/Treasury/Reports/Backup/OpenAPI/i18n — 89 E2E)؛ web: الأساس جاهز + 5 وكلاء واجهة قيد التشغيل؛ باقي دمج شاشات الويب + desktop |
+| هل يوجد كود تطبيق؟ | **نعم** — `packages/domain` (919 اختبار، 99.67%)، `packages/db` (migration 0001 + 35 اختبار قاعدة بيانات)، `apps/api` (89 اختبار E2E، 84 مسارًا، OpenAPI على /api/docs)، `apps/web` (أساس: عميل API، مخزن مصادقة، i18n ar/en، Shell RTL/LTR، دخول، معالج إعداد، لوحة) |
 | الفرع النشط | `genspark_ai_developer` |
 | آخر PR | https://github.com/moain2028/Pharmacy-System/pull/3 (مفتوح — يُحدَّث بنفس الفرع) |
 
@@ -26,12 +26,11 @@
 - `apps/api` NestJS/Fastify: Identity (Argon2id، JWT + refresh دوّار مع كشف إعادة الاستخدام، قفل بعد 5 محاولات، صلاحيات `resource.action` + overrides، معالج الإعداد الأولي)، Catalog (أصناف + سلّم وحدات مرن + باركود GS1 + أسعار + سعر رسمي + أسعار صرف)، Inventory (استلام، أرصدة، FEFO preview، حالات الدفعات، تسويات، تحويلات، كاردكس، worklist الانتهاء). **36 اختبار E2E** على PostgreSQL حقيقي.
 
 **المهمة التالية بالضبط (بالترتيب):**
-1. **API Sales Returns + Customers + Receipts** (`apps/api/src/sales/returns.service.ts`, `customers/*`): استخدم domain `SalesReturn.create(req, {defaultReturnWindowDays})` → `post()` → `postingIntent()`؛ ابنِ `PostedInvoiceSnapshot` من `sales_invoices/lines/sale_line_lots/invoice_payments` (returnedQtySsu من `sales_return_lines` المرحّلة)؛ حركات `SALE_RETURN` موجبة على اللوط الأصلي؛ القيد `salesReturnPosted` (refunds كـ PaymentPart، restock = lotCosts)؛ الاسترداد النقدي = `cash_movements` kind `SALE_REFUND` (سالب). المقبوضات: `party_payments` (party_type CUSTOMER) + `customerPaymentPosted` (arSettledBase/depositBase) + `CUSTOMER_PAYMENT` cash movement.
-2. **API Purchasing**: suppliers CRUD، PO (`PurchaseOrder`)، GRN (`GoodsReceipt` → لوطات جديدة + RECEIPT + `goodsReceiptPosted`)، فاتورة مورد (`SupplierInvoice` مع GrnLineRef؛ حسابات ap=2100, grni=2150, priceVariance=5150, tax=1500, direct=1400)، مرتجع شراء (`PurchaseReturn` returnLoss=5250)، مدفوعات الموردين (`allocatePayment` FIFO/PRO_RATA/EXPLICIT + `postSupplierPayment`).
-3. **API Treasury/Expenses/Reports**: expenses (`postExpense` بحساب الفئة)، transfers/FX (`postCashTransfer`/`postFxExchange` + حركات مزدوجة بـ pair_id)، opening balances (`postOpeningBalances` balancing=3100)؛ تقارير: ميزان مراجعة، أرباح/خسائر، مبيعات يومية/شهرية، مخزون، صلاحيات، أعمار ذمم (`ageOpenItems`).
-4. **API عام**: backup (pg_dump endpoint + جدولة)، استيراد/تصدير CSV/Excel، OpenAPI (`@nestjs/swagger`)، ترجمة الأخطاء ar/en في `http-exception.filter`.
-5. **apps/web** (React + Vite + Tailwind، RTL/LTR، i18n، POS بلوحة مفاتيح أولاً، معالج الإعداد) ثم **apps/desktop** (Tauri 2 + PostgreSQL مضمّن كخدمة Windows + مثبّت).
-6. ملاحظة ثابت الصلاحية: domain `shift.ts` يستخدم `"shift.reopen"` بينما الكتالوج `shifts.reopen` — وحّدهما عند بناء reopen.
+1. **دمج مخرجات وكلاء الواجهة E1–E5** (ملفات `.tmp_agents/E1-pos.json`, `E2-catalog-inventory.json`, `E3-sales-returns-customers.json`, `E4-purchasing-payables-cash.json`, `E5-reports-accounting-users-settings.json`؛ السجل `.tmp_agents/run_web1.log`): لكل واحد `python3 tools/agents/salvage.py <json> --write --root .` → `cd apps/web && pnpm exec tsc --noEmit && pnpm exec eslint src --max-warnings=0 && pnpm exec vitest run`. متوقع إصلاحات صغيرة: أسماء حقول الاستجابة، مفاتيح i18n (ادمج `*.keys.ts` في `src/i18n/ar.ts`/`en.ts` أو حمّلها في `DICTS`)، استيراد `@/`. إن فشل وكيل (مخرج صغير/أسئلة بدل كود كما حدث مع D3) أعد تشغيله بإجابات دقيقة (انظر `build_jobs_api.py` نمط D3b).
+2. **تشغيل الويب على API حقيقي**: `pnpm --filter @pharmacore/api dev` (PORT 3100) + `API_URL=http://localhost:3100 pnpm --filter @pharmacore/web dev` → معالج الإعداد → دخول → POS. اختبر بيعًا كاملًا بلوحة المفاتيح وطباعة إيصال.
+3. **apps/desktop (Tauri 2)**: تضمين PostgreSQL 16 portable كخدمة Windows (`pg_ctl register`)، تشغيل API كـ sidecar (Node SEA أو pkg)، إنشاء `JWT_SECRET` لكل جهاز، `BACKUP_DIR=%ProgramData%\PharmaCore\backups`، مثبّت NSIS/MSI بعربية/إنجليزية، أيقونة، تحديثات.
+4. **استيراد/تصدير CSV/Excel** في API (أصناف، عملاء، موردون، جرد افتتاحي) — endpoint `POST /import/items` بملف CSV مع معاينة أخطاء صفّية.
+5. **تجربة في الصيدلية + تصحيحات**، ثم وسم إصدار v0.1.0.
 
 ## 3. خارطة المراحل الكلية
 | # | المرحلة | الحالة | المخرجات الرئيسية |

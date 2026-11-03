@@ -17,7 +17,7 @@ export const SALES_PERMISSIONS = Object.freeze({
   sellAboveOfficial: "sales.sell_above_official",
   zeroInvoice: "sales.zero_invoice",
   reverse: "sales.reverse",
-  creditOverride: "customers.credit_override",
+  creditOverride: "sales.credit",
 } as const);
 
 export interface GuardOverride {

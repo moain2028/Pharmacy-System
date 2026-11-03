@@ -15,13 +15,13 @@ export const PERMISSIONS = [
   "prices.read", "prices.update", "prices.official_manage", "price_lists.manage",
   // inventory
   "stock.read", "stock.adjust", "stock.transfer", "stock.stocktake",
-  "lots.read", "lots.status_change", "lots.destroy",
+  "lots.read", "lots.status_change", "lots.destroy", "lots.override_fefo",
   "expiry.read",
   // sales
   "sales.read", "sales.create", "sales.post", "sales.hold", "sales.reverse",
   "sales.discount_line", "sales.discount_invoice", "sales.sell_below_min", "sales.sell_below_cost",
   "sales.override_official_price", "sales.credit", "sales.change_price",
-  "returns.create", "returns.post", "returns.without_invoice",
+  "returns.create", "returns.post", "returns.without_invoice", "returns.late", "returns.non_returnable",
   "customers.read", "customers.manage", "customers.credit_limit",
   // cash & shifts
   "shifts.open", "shifts.close", "shifts.close_others", "shifts.reopen", "shifts.read",
@@ -29,9 +29,9 @@ export const PERMISSIONS = [
   "cashboxes.manage",
   // purchasing
   "suppliers.read", "suppliers.manage",
-  "purchase_orders.read", "purchase_orders.create", "purchase_orders.approve",
+  "purchase_orders.read", "purchase_orders.create", "purchase_orders.approve", "purchase_orders.reopen",
   "goods_receipts.read", "goods_receipts.create", "goods_receipts.post",
-  "supplier_invoices.read", "supplier_invoices.create", "supplier_invoices.post",
+  "supplier_invoices.read", "supplier_invoices.create", "supplier_invoices.post", "supplier_invoices.match_override",
   "purchase_returns.create", "purchase_returns.post",
   "payables.pay",
   // accounting & reports

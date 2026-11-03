@@ -142,7 +142,7 @@ export class InventoryService {
       const rows = await tx<Array<LotRow & { qty_ssu: string }>>`SELECT l.*, b.qty_ssu FROM stock_balances b JOIN lots l ON l.id = b.lot_id WHERE b.item_id = ${input.itemId} AND b.location_id = ${input.locationId} AND b.qty_ssu > 0`;
       const lots: LotBalance[] = rows.map((r) => ({ lot: hydrate(r), availableSsu: BigInt(r.qty_ssu), receivedAt: r.received_at.toISOString() }));
       const res = allocateFefo(
-        { itemId: input.itemId, qtySsu: BigInt(input.qtySsu), businessDate: date, lots, overrideLotId: input.overrideLotId, override: input.override ? { permission: "inventory.lot_override_fefo", ...input.override } : undefined },
+        { itemId: input.itemId, qtySsu: BigInt(input.qtySsu), businessDate: date, lots, overrideLotId: input.overrideLotId, override: input.override ? { permission: "lots.override_fefo", ...input.override } : undefined },
         { allowNegativeStock: p.allowNegativeStock, nearExpiryDays: p.nearExpiryDays, saleBlockDaysBeforeExpiry: p.saleBlockDaysBeforeExpiry },
       );
       if (isErr(res)) throw res.error;

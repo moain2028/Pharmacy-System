@@ -6,7 +6,7 @@
  * - Close: counted cash (amount or denominations) -> variance = counted - expected; above tolerance
  *   requires reason + supervisor (FR-SHF-107/109). Produces an immutable Z snapshot (FR-SHF-110).
  * - X report any time while OPEN; never changes state (FR-SHF-106). Blind close hides expected.
- * - Reopen requires permission `shift.reopen` + reason; previous closings are kept in history.
+ * - Reopen requires permission `shifts.reopen` + reason; previous closings are kept in history.
  */
 import { CURRENCY_CODES, type CurrencyCode } from "../money/currency.js";
 import { Money } from "../money/money.js";
@@ -19,7 +19,7 @@ export const SHIFT_MODES = ["per_user", "per_device"] as const;
 export type ShiftMode = (typeof SHIFT_MODES)[number];
 export const PAYMENT_METHODS = ["cash", "wallet", "card", "credit", "advance"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
-export const SHIFT_REOPEN_PERMISSION = "shift.reopen" as const;
+export const SHIFT_REOPEN_PERMISSION = "shifts.reopen" as const;
 
 export interface ShiftRef { readonly shiftId: string; readonly userId: string; readonly cashboxId: string; readonly status: ShiftStatus }
 /** One payment line of a posted sale or refund (all methods, not only cash). */

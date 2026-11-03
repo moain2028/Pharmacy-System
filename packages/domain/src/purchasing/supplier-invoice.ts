@@ -21,7 +21,7 @@ export const SUPPLIER_INVOICE_STATUSES = ["DRAFT", "POSTED", "REVERSED"] as cons
 export type SupplierInvoiceStatus = (typeof SUPPLIER_INVOICE_STATUSES)[number];
 export const MATCH_STATUSES = ["MATCHED", "PRICE_VARIANCE", "QTY_VARIANCE", "OVER_TOLERANCE", "UNMATCHED"] as const;
 export type MatchStatus = (typeof MATCH_STATUSES)[number];
-export const MATCH_OVERRIDE_PERMISSION = "purchase.match_override" as const;
+export const MATCH_OVERRIDE_PERMISSION = "supplier_invoices.match_override" as const;
 export const SUPPLIER_INVOICE_DOC_TYPE = "SUPPLIER_INVOICE" as const;
 
 const RANK: Readonly<Record<MatchStatus, number>> = Object.freeze({

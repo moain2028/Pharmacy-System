@@ -9,6 +9,11 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32),
   ACCESS_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(15 * 60),
   REFRESH_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(14 * 24 * 3600),
+  /** Directory for pg_dump backups (desktop installer points this at %ProgramData%\PharmaCore\backups). */
+  BACKUP_DIR: z.string().default("./backups"),
+  /** Expose Swagger UI in production too (desktop build sets true; LAN-only). */
+  ENABLE_DOCS: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
+  BACKUP_KEEP: z.coerce.number().int().min(1).default(30),
   AUTO_MIGRATE: z
     .enum(["true", "false"])
     .default("true")

@@ -20,9 +20,9 @@ export const PO_STATUSES = ["DRAFT", "PENDING_APPROVAL", "POSTED", "PARTIALLY_RE
 export type PoStatus = (typeof PO_STATUSES)[number];
 export const SUPPLIER_STATUSES = ["ACTIVE", "BLOCKED", "INACTIVE"] as const;
 export type SupplierStatus = (typeof SUPPLIER_STATUSES)[number];
-export const PO_CREATE_PERMISSION = "purchase_order.create" as const;
-export const PO_APPROVE_PERMISSION = "purchase_order.approve" as const;
-export const PO_REOPEN_PERMISSION = "purchase_order.reopen" as const;
+export const PO_CREATE_PERMISSION = "purchase_orders.create" as const;
+export const PO_APPROVE_PERMISSION = "purchase_orders.approve" as const;
+export const PO_REOPEN_PERMISSION = "purchase_orders.reopen" as const;
 export type ApprovalReason = "PO_AMOUNT_LIMIT" | "DISCOUNT_LIMIT";
 export const RECEIVABLE_PO_STATUSES: readonly PoStatus[] = Object.freeze(["POSTED", "PARTIALLY_RECEIVED"]);
 
