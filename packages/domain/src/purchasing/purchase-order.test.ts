@@ -136,7 +136,7 @@ describe("receiving, closing, cancelling", () => {
     expect(closed.closure?.reason).toBe("supplier out of stock");
     expect(unwrap(closed.remainingSsu("l1"))).toBe(20n);
     expect(closed.canReceive()).toBe(false);
-    expect(errCode(closed.reopen("purchase_order.create"))).toBe("po.permission_required");
+    expect(errCode(closed.reopen("purchase_orders.create"))).toBe("po.permission_required");
     const reopened = unwrap(closed.reopen(PO_REOPEN_PERMISSION));
     expect(reopened.status).toBe("PARTIALLY_RECEIVED");
     expect(reopened.closure).toBeNull();

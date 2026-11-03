@@ -25,7 +25,7 @@ export function isTenderMethod(x: unknown): x is TenderMethod {
 }
 
 /** Permission allowing a supervisor to exceed a customer's credit limit (FR-SAL-128). */
-export const CREDIT_OVERRIDE_PERMISSION = "customers.credit_override" as const;
+export const CREDIT_OVERRIDE_PERMISSION = "sales.credit" as const;
 
 export interface Tender {
   readonly method: TenderMethod;

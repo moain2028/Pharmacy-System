@@ -13,7 +13,7 @@ import { toSsu } from "../quantity/quantity.js";
 import { parseIsoDate, type IsoDate } from "./iso-date.js";
 import { isSellableStatus, type Lot, type LotEffectiveStatus } from "./lot.js";
 
-export const FEFO_OVERRIDE_PERMISSION = "inventory.lot_override_fefo" as const;
+export const FEFO_OVERRIDE_PERMISSION = "lots.override_fefo" as const;
 export type FefoOverridePermission = typeof FEFO_OVERRIDE_PERMISSION;
 
 export interface LotBalance {
