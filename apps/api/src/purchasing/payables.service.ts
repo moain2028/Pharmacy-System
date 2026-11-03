@@ -148,7 +148,7 @@ export class PayablesService {
       const rate = await this.rate(tx, req.currency, tenant.base_currency);
       const unitIds = [...new Set(req.lines.map((l) => l.unitId))];
       const units = await tx<UnitRow[]>`SELECT id, item_id, factor_to_ssu, is_ssu FROM item_units
-        WHERE tenant_id = ${tenantId} AND id = ANY(${tx.array(unitIds)}::uuid[])`;
+        WHERE tenant_id = ${tenantId} AND id = ANY(${unitIds}::uuid[])`;
       const byUnit = new Map(units.map((u) => [u.id, u]));
       const refIds = req.lines.flatMap((l) => l.grnLineId ? [l.grnLineId] : []);
       const refs = refIds.length === 0 ? [] : await tx<GrnRow[]>`SELECT gl.id, gl.receipt_id, gl.item_id, gl.factor_snapshot,
@@ -158,7 +158,7 @@ export class PayablesService {
         JOIN goods_receipts gr ON gr.id = gl.receipt_id AND gr.tenant_id = gl.tenant_id
         JOIN lots lot ON lot.id = gl.lot_id AND lot.tenant_id = gl.tenant_id
         LEFT JOIN purchase_order_lines po ON po.id = gl.order_line_id AND po.tenant_id = gl.tenant_id
-        WHERE gl.tenant_id = ${tenantId} AND gl.id = ANY(${tx.array(refIds)}::uuid[])
+        WHERE gl.tenant_id = ${tenantId} AND gl.id = ANY(${refIds}::uuid[])
           AND gr.supplier_id = ${req.supplierId} AND gr.status = 'POSTED'`;
       const grnLines: GrnLineRef[] = refs.map((r) => ({
         grnId: r.receipt_id, grnLineId: r.id, itemId: r.item_id, factor: BigInt(r.factor_snapshot),
@@ -235,14 +235,14 @@ export class PayablesService {
       const currency = supplier.default_currency ?? tenant.base_currency;
       const rate = await this.rate(tx, currency, tenant.base_currency);
       const ids = [...new Set(req.lines.map((l) => l.lotId))].sort();
-      const lots = await tx<LotRow[]>`SELECT * FROM lots WHERE tenant_id = ${tenantId} AND id = ANY(${tx.array(ids)}::uuid[]) ORDER BY id FOR UPDATE`;
+      const lots = await tx<LotRow[]>`SELECT * FROM lots WHERE tenant_id = ${tenantId} AND id = ANY(${ids}::uuid[]) ORDER BY id FOR UPDATE`;
       const byLot = new Map(lots.map((l) => [l.id, l]));
       const balances = await tx<{ lot_id: string; qty_ssu: string }[]>`SELECT lot_id, qty_ssu::text FROM stock_balances
-        WHERE tenant_id = ${tenantId} AND location_id = ${req.locationId} AND lot_id = ANY(${tx.array(ids)}::uuid[])`;
+        WHERE tenant_id = ${tenantId} AND location_id = ${req.locationId} AND lot_id = ANY(${ids}::uuid[])`;
       const byBalance = new Map(balances.map((b) => [b.lot_id, BigInt(b.qty_ssu)]));
       const itemIds = [...new Set(lots.map((l) => l.item_id))];
       const units = itemIds.length === 0 ? [] : await tx<UnitRow[]>`SELECT id, item_id, factor_to_ssu, is_ssu FROM item_units
-        WHERE tenant_id = ${tenantId} AND item_id = ANY(${tx.array(itemIds)}::uuid[]) AND is_ssu = true`;
+        WHERE tenant_id = ${tenantId} AND item_id = ANY(${itemIds}::uuid[]) AND is_ssu = true`;
       const ssuUnits = new Map(units.map((u) => [u.item_id, u]));
       const lines = req.lines.map((l) => {
         const row = required(byLot.get(l.lotId), "lots.not_found", "Lot not found");
@@ -290,7 +290,7 @@ export class PayablesService {
       if (posted.fullyReturnedLotIds.length) {
         await tx`UPDATE lots l SET manual_status = 'RETURNED_TO_SUPPLIER'::lot_manual_status, status_reason = ${req.reason},
           status_changed_by = ${actor.userId}, status_changed_at = ${now}, updated_at = ${now}, version = version + 1
-          WHERE l.tenant_id = ${tenantId} AND l.id = ANY(${tx.array([...posted.fullyReturnedLotIds])}::uuid[])
+          WHERE l.tenant_id = ${tenantId} AND l.id = ANY(${[...posted.fullyReturnedLotIds]}::uuid[])
             AND NOT EXISTS (SELECT 1 FROM stock_balances b WHERE b.tenant_id = l.tenant_id AND b.lot_id = l.id AND b.qty_ssu <> 0)`;
       }
       await tx`UPDATE purchase_returns SET status = 'POSTED', posted_at = ${now}, posted_by = ${actor.userId}

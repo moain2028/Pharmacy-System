@@ -174,12 +174,12 @@ export class TreasuryService {
       if (allocs.length > 0) {
         const invs = await tx<{ id: string; customer_id: string | null; currency: CurrencyCode; credit_minor: string; rate_scaled_snapshot: string | null; status: string }[]>`
           SELECT id, customer_id, currency, credit_minor, rate_scaled_snapshot, status FROM sales_invoices
-          WHERE tenant_id = ${tenantId} AND id = ANY(${tx.array(ids)}) FOR UPDATE`;
+          WHERE tenant_id = ${tenantId} AND id = ANY(${ids}::uuid[]) FOR UPDATE`;
         const paidRows = await tx<{ id: string; s: string }[]>`
           SELECT a->>'documentId' AS id, SUM((a->>'amountMinor')::bigint)::text AS s
           FROM party_payments p CROSS JOIN LATERAL jsonb_array_elements(p.allocations) a
           WHERE p.tenant_id = ${tenantId} AND p.party_type = 'CUSTOMER' AND p.status = 'POSTED' AND p.customer_id = ${r.customerId}
-            AND a->>'documentId' = ANY(${tx.array(ids)}) GROUP BY 1`;
+            AND a->>'documentId' = ANY(${ids}::text[]) GROUP BY 1`;
         const paid = new Map(paidRows.map((p) => [p.id, BigInt(p.s)]));
         for (const a of allocs) {
           const inv = invs.find((i) => i.id === a.invoiceId);
@@ -362,7 +362,7 @@ export class TreasuryService {
       if (t.posted === "true") throw ApiError.conflict("treasury.opening_already_posted", "Opening balances were already posted");
       const base = t.base_currency;
       const cbIds = [...new Set(r.lines.flatMap((l) => (l.cashboxId === undefined ? [] : [l.cashboxId])))];
-      const cbs = cbIds.length === 0 ? [] : await tx<CashboxRow[]>`SELECT id, code, kind, is_active FROM cashboxes WHERE tenant_id = ${tenantId} AND id = ANY(${tx.array(cbIds)})`;
+      const cbs = cbIds.length === 0 ? [] : await tx<CashboxRow[]>`SELECT id, code, kind, is_active FROM cashboxes WHERE tenant_id = ${tenantId} AND id = ANY(${cbIds}::uuid[])`;
       const cbMap = new Map(cbs.map((c) => [c.id, c]));
       for (const id of cbIds) if (!cbMap.has(id)) throw ApiError.notFound("cashbox.not_found", `Cashbox ${id} not found`);
       const rates = new Map<CurrencyCode, bigint | undefined>();

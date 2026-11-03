@@ -84,7 +84,7 @@ function unitOf(units: Map<string, UnitRow>, id: string): UnitRow {
 }
 async function unitsOf(tx: Sql, tenantId: string, ids: readonly string[]): Promise<Map<string, UnitRow>> {
   const rows = await tx<UnitRow[]>`SELECT u.*, i.track_expiry, i.is_active AS item_active FROM item_units u JOIN items i ON i.id = u.item_id
-    WHERE u.tenant_id = ${tenantId} AND u.id = ANY(${tx.array([...new Set(ids)])}::uuid[])`;
+    WHERE u.tenant_id = ${tenantId} AND u.id = ANY(${[...new Set(ids)]}::uuid[])`;
   return new Map(rows.map((r) => [r.id, r]));
 }
 async function tenantOf(tx: Sql, tenantId: string): Promise<{ base: CurrencyCode; settings: Record<string, unknown> }> {
@@ -347,13 +347,13 @@ export class PurchasingService {
       await tx`INSERT INTO lots ${tx(lotRows)}`;
       await tx`INSERT INTO goods_receipt_lines ${tx(lineRows)}`;
       await tx`INSERT INTO stock_movements ${tx(mvRows)}`;
-      await tx`UPDATE item_units SET factor_locked_at = now() WHERE tenant_id = ${tenantId} AND factor_locked_at IS NULL AND id = ANY(${tx.array([...units.keys()])}::uuid[])`;
+      await tx`UPDATE item_units SET factor_locked_at = now() WHERE tenant_id = ${tenantId} AND factor_locked_at IS NULL AND id = ANY(${[...units.keys()]}::uuid[])`;
       await tx`UPDATE goods_receipts SET status = 'POSTED', posted_at = ${postedAt}, posted_by = ${actor.userId}, version = version + 1, updated_at = now() WHERE id = ${grnId} AND tenant_id = ${tenantId}`;
 
       if (p.po && poRow) {
         const ids = p.po.lines.map((l) => l.lineId);
         const recv = p.po.lines.map((l) => l.receivedSsu.toString());
-        await tx`UPDATE purchase_order_lines l SET received_ssu = v.r::bigint FROM unnest(${tx.array(ids)}::uuid[], ${tx.array(recv)}::text[]) AS v(id, r) WHERE l.id = v.id AND l.tenant_id = ${tenantId}`;
+        await tx`UPDATE purchase_order_lines l SET received_ssu = v.r::bigint FROM unnest(${ids}::uuid[], ${recv}::text[]) AS v(id, r) WHERE l.id = v.id AND l.tenant_id = ${tenantId}`;
         await tx`UPDATE purchase_orders SET status = ${toDbStatus(p.po.status)}, version = version + 1, updated_at = now() WHERE id = ${poRow.id} AND tenant_id = ${tenantId}`;
       }
 

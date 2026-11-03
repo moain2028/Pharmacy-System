@@ -40,15 +40,14 @@ const loc = (await must("GET", "/inventory/locations", undefined, 200)).find((l)
 ok(!!sup.id && !!loc, "item, prices, supplier, location");
 
 step("purchasing: PO → approve → GRN");
-const po = await must("POST", "/purchase-orders", { supplierId: sup.id, currency: "YER_NEW", lines: [{ itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "2400000" }] });
+const po = await must("POST", "/purchase-orders", { supplierId: sup.id, currency: "YER_NEW", lines: [{ itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "240000" }] });
 await must("POST", `/purchase-orders/${po.id}/approve`, {}, 200);
 const poDet = await must("GET", `/purchase-orders/${po.id}`, undefined, 200);
 const poLines = poDet.lines ?? poDet.order?.lines ?? [];
 const poLineId = poLines[0]?.id;
-const grn = await must("POST", "/goods-receipts", { supplierId: sup.id, ...(poLineId ? { purchaseOrderId: po.id } : {}), locationId: loc, currency: "YER_NEW", businessDate: D, lines: [{ ...(poLineId ? { poLineId } : {}), itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "2400000", lotNumber: `L${tag}`, expiryDate: "2027-06-30" }] });
+const grn = await must("POST", "/goods-receipts", { supplierId: sup.id, ...(poLineId ? { purchaseOrderId: po.id } : {}), locationId: loc, currency: "YER_NEW", businessDate: D, lines: [{ ...(poLineId ? { poLineId } : {}), itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "240000", lotNumber: `L${tag}`, expiryDate: "2027-06-30" }] });
 const bal = await must("GET", `/inventory/items/${item.id}/balances`, undefined, 200);
-const balRows = Array.isArray(bal) ? bal : (bal.rows ?? bal.balances ?? []);
-const onHand = balRows.reduce((a, b) => a + BigInt(b.qty_ssu), 0n); ok(onHand === 480n, `on hand 480 SSU after GRN (got ${onHand})`);
+const onHand = BigInt(bal.totalSsu ?? "0"); ok(onHand === 480n, `on hand 480 SSU after GRN (got ${onHand})`);
 
 step("shift + sale with change");
 const cashboxes = await must("GET", "/cashboxes", undefined, 200); const reg = cashboxes.find((c) => c.code === "REG1").id;
@@ -58,7 +57,7 @@ const quote = await must("POST", "/sales/quote", { businessDate: D, lines: [{ it
 ok(quote.totals.total.amountMinor === "375000", `quote total 3,750.00 (got ${quote.totals.total.amountMinor})`);
 const sale = await must("POST", "/sales", { businessDate: D, lines: [{ itemId: item.id, unitId: U.Box, qtyInUnit: 2 }, { itemId: item.id, unitId: U.Strip, qtyInUnit: 1 }], tenders: [{ method: "CASH", currency: "YER_NEW", amountMinor: "400000" }], idempotencyKey: `smoke-${tag}` });
 ok(sale.settlement.change.amountMinor === "25000", `change 250.00 (got ${sale.settlement.change.amountMinor})`); ok(/^INV-/.test(sale.number), `invoice ${sale.number}`);
-const cogs = sale.totals.cogs.amountMinor; ok(cogs === "600000", `COGS 60 SSU × 100.00 = 6,000.00 (got ${cogs})`);
+const cogs = sale.totals.cogsTotal.amountMinor; ok(cogs === "60000", `COGS 60 SSU × 10.00 = 600.00 (got ${cogs})`);
 
 step("sales return (1 box)");
 const inv = await must("GET", `/sales/${sale.id}`, undefined, 200);
@@ -78,23 +77,23 @@ const cdet = await must("GET", `/customers/${cust.id}`, undefined, 200); ok(cdet
 step("payables: supplier invoice + payment");
 const grnFull = await must("GET", `/goods-receipts/${grn.id}`, undefined, 200);
 const grnLine = (grnFull.lines ?? grnFull.receipt?.lines ?? [])[0];
-const si = await must("POST", "/supplier-invoices", { supplierId: sup.id, supplierInvoiceNo: `SI-${tag}`, invoiceDate: D, currency: "YER_NEW", lines: [{ grnLineId: grnLine?.id, itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "2400000" }] });
+const si = await must("POST", "/supplier-invoices", { supplierId: sup.id, supplierInvoiceNo: `SI-${tag}`, invoiceDate: D, currency: "YER_NEW", lines: [{ grnLineId: grnLine?.id, itemId: item.id, unitId: U.Carton, qtyInUnit: 2, unitCostMinor: "240000" }] });
 ok(!!si.id, `supplier invoice ${si.number ?? si.id} matchStatus=${si.matchStatus ?? "?"}`);
-await must("POST", "/supplier-payments", { supplierId: sup.id, cashboxId: reg, method: "CASH", currency: "YER_NEW", amountMinor: "1000000", businessDate: D, allocation: { mode: "FIFO" } });
+await must("POST", "/supplier-payments", { supplierId: sup.id, cashboxId: reg, method: "CASH", currency: "YER_NEW", amountMinor: "200000", businessDate: D, allocation: { mode: "FIFO" } });
 const ledger = await must("GET", `/suppliers/${sup.id}/ledger`, undefined, 200); ok(!!ledger, "supplier ledger readable");
 
 step("shift X report + close");
 const x = await must("GET", `/shifts/${shift.id}/x-report`, undefined, 200);
 const expected = x.expectedCash.find((m) => m.currency === "YER_NEW").amountMinor;
-// 500000 float + 375000 sale − 150000 refund − 120000 expense + 100000 receipt − 1000000 supplier payment = −295000 → drawer would be negative; the pharmacy tops up
+// 500000 float + 375000 sale − 150000 refund − 120000 expense + 100000 receipt − 200000 partial supplier payment = 505000
 console.log(`  expected cash YER_NEW = ${expected}`);
-const close = await must("POST", `/shifts/${shift.id}/close`, { counts: [{ currency: "YER_NEW", amountMinor: expected }], approver: { username: "owner", secret: "1234" } }, 200);
+const close = await must("POST", `/shifts/${shift.id}/close`, { counts: [{ currency: "YER_NEW", amountMinor: BigInt(expected) < 0n ? "0" : expected }], ...(BigInt(expected) < 0n ? { reasons: { YER_NEW: "drawer topped up from safe (smoke)" } } : {}), approver: { username: "owner", secret: "1234" } }, 200);
 ok(close.zReport?.type === "Z" || close.zReport, "Z report produced");
 
 step("accounting identities");
 const tb = await must("GET", "/reports/trial-balance?to=2026-12-31", undefined, 200);
 ok(tb.totals.balanced === true && tb.totals.debit === tb.totals.credit, `trial balance balanced (${tb.totals.debit})`);
-const pnl = await must("GET", `/reports/pnl?from=${D}&to=2026-12-31`, undefined, 200); ok(!!pnl.netProfit, `P&L net ${JSON.stringify(pnl.netProfit)}`);
+const pnl = await must("GET", `/reports/pnl?from=${D}&to=2026-12-31`, undefined, 200); ok(pnl.totals && pnl.totals.netProfit !== undefined, `P&L net ${JSON.stringify(pnl.totals?.netProfit)}`);
 const bs = await must("GET", "/reports/balance-sheet?to=2026-12-31", undefined, 200); ok(bs.balanced === true || bs.totals?.balanced === true, "balance sheet balanced");
 const val = await must("GET", "/reports/inventory-valuation", undefined, 200); ok(Array.isArray(val.rows), `inventory valuation rows ${val.rows.length}`);
 

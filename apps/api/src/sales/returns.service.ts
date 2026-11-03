@@ -117,7 +117,7 @@ export class ReturnsService {
       }
       if (ssuItems.size > 0) {
         const us = await tx<{ item_id: string; id: string }[]>`SELECT DISTINCT ON (item_id) item_id, id FROM item_units
-          WHERE item_id = ANY(${tx.array([...ssuItems])}::uuid[]) AND factor_to_ssu = 1 ORDER BY item_id, id`;
+          WHERE item_id = ANY(${[...ssuItems]}::uuid[]) AND factor_to_ssu = 1 ORDER BY item_id, id`;
         const byItem = new Map(us.map((u) => [u.item_id, u.id] as const));
         for (const p of plans) {
           if (!p.ssuFallback) continue;
@@ -147,7 +147,7 @@ export class ReturnsService {
         if (ids.length === 0) continue;
         await tx`UPDATE lots SET manual_status = ${dest}::lot_manual_status, status_reason = ${`Sales return ${num.n}: ${reasonText}`},
             status_changed_by = ${actor.userId}, status_changed_at = now(), updated_at = now(), version = version + 1
-          WHERE id = ANY(${tx.array(ids)}::uuid[]) AND manual_status = 'NONE'`;
+          WHERE id = ANY(${ids}::uuid[]) AND manual_status = 'NONE'`;
       }
 
       let rate: bigint | undefined;
